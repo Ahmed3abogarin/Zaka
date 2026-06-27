@@ -24,3 +24,12 @@ val TextPrimary = Color(0xFF111827)
 val TextSecond = Color(0xFF6B7280)
 
 val BorderColor = Color(0xFFE5E7EB)
+
+val Purple50 = Color(0xFFF5F3FF)
+val RedError = Color(0xFFEF4444)
+val RedLight = Color(0xFFFEF2F2)
+val GreenSuccess = Color(0xFF22C55E)
+val GreenLight = Color(0xFFF0FDF4)
+val BorderDefault = Color(0xFFE5E7EB)
+val TimerBg = Color(0xFFFFF9C4)
+val TimerText = Color(0xFFF59E0B)

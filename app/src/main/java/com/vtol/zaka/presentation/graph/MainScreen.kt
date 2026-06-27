@@ -11,15 +11,20 @@ import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.home.HomeScreen
+import com.vtol.zaka.presentation.quiz.QuizScreen
+import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.scan.ScanScreen
 import kotlinx.serialization.Serializable
 
@@ -74,12 +79,31 @@ fun MainScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<HomeRoute> { HomeScreen() }
-            composable<ScanRoute> { ScanScreen() }
-            composable<QuizRoute> {  }
+
+            navigation<QuizGraphRoute>(startDestination = ScanRoute) {
+
+                composable<ScanRoute> { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry<QuizGraphRoute>()
+                    }
+                    val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+                    ScanScreen(viewModel = viewModel) { navController.navigate(QuizRoute) }
+                }
+
+                composable<QuizRoute> { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry<QuizGraphRoute>()
+                    }
+                    val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+                    QuizScreen(viewModel = viewModel)
+                }
+            }
         }
     }
 }
 
+@Serializable
+object QuizGraphRoute
 @Serializable
 object QuizRoute
 @Serializable

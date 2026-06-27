@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class QuizRepositoryImpl @Inject constructor(
     private val model: GenerativeModel
-): QuizRepository {
+) : QuizRepository {
 
     override suspend fun generateFromImage(
         bitmap: Bitmap,
@@ -26,7 +26,8 @@ class QuizRepositoryImpl @Inject constructor(
                     text(prompt)
                 }
             )
-            val json = response.text ?: return@withContext Result.failure(Exception("استجابة فارغة"))
+            val json =
+                response.text ?: return@withContext Result.failure(Exception("استجابة فارغة"))
             Result.success(parseResponse(json, "مخصص"))
         } catch (e: Exception) {
             Result.failure(e)
@@ -47,7 +48,8 @@ class QuizRepositoryImpl @Inject constructor(
                     text(prompt)
                 }
             )
-            val json = response.text ?: return@withContext Result.failure(Exception("استجابة فارغة"))
+            val json =
+                response.text ?: return@withContext Result.failure(Exception("استجابة فارغة"))
             Result.success(parseResponse(json, "مخصص"))
         } catch (e: Exception) {
             Result.failure(e)
@@ -73,7 +75,7 @@ class QuizRepositoryImpl @Inject constructor(
 
             val difficulty = try {
                 Difficulty.valueOf(q.getString("difficulty"))
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Difficulty.MEDIUM
             }
 
@@ -82,7 +84,7 @@ class QuizRepositoryImpl @Inject constructor(
                     id = q.optString("id", "$topic-$i"),
                     text = q.getString("text"),
                     options = options,
-                    correctAnswer = q.getString("correctAnswer"),
+                    correctIndex = options.indexOf(q.getString("correctAnswer")), // ← derive here
                     explanation = q.getString("explanation"),
                     topic = q.optString("topic", topic),
                     difficulty = difficulty

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vtol.zaka.domain.models.ScanHistoryItem
+import com.vtol.zaka.presentation.quiz.QuizUiEffect
 import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
@@ -38,8 +40,17 @@ import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
-fun ScanScreen(viewModel: QuizViewModel = hiltViewModel()) {
+fun ScanScreen(viewModel: QuizViewModel, navigateToQuiz: () -> Unit) {
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect {
+            when (it) {
+                is QuizUiEffect.NavigateToQuiz -> navigateToQuiz()
+            }
+        }
+
+    }
 
     // PDF picker
     val pdfLauncher = rememberLauncherForActivityResult(
@@ -188,6 +199,5 @@ fun ScanScreen(viewModel: QuizViewModel = hiltViewModel()) {
 @Composable
 fun ScanScreenPreview() {
     MaterialTheme {
-        ScanScreen()
     }
 }
