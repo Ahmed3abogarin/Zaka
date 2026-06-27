@@ -35,22 +35,19 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.vtol.zaka.R
 import com.vtol.zaka.domain.models.QuizResult
 import com.vtol.zaka.domain.models.Subject
+import com.vtol.zaka.ui.theme.GrayBg
+import com.vtol.zaka.ui.theme.GrayCard
+import com.vtol.zaka.ui.theme.Green500
+import com.vtol.zaka.ui.theme.Orange100
+import com.vtol.zaka.ui.theme.Orange400
+import com.vtol.zaka.ui.theme.Purple100
+import com.vtol.zaka.ui.theme.Purple500
+import com.vtol.zaka.ui.theme.Purple700
+import com.vtol.zaka.ui.theme.Teal100
+import com.vtol.zaka.ui.theme.Teal400
+import com.vtol.zaka.ui.theme.TextPrimary
+import com.vtol.zaka.ui.theme.TextSecond
 
-// ── Color tokens ──────────────────────────────────────────────────────────────
-val Purple700 = Color(0xFF5B21B6)
-val Purple500 = Color(0xFF7C3AED)
-val Purple100 = Color(0xFFEDE9FE)
-val Teal400 = Color(0xFF2DD4BF)
-val Teal100 = Color(0xFFCCFBF1)
-val Green500 = Color(0xFF22C55E)
-val Orange400 = Color(0xFFFB923C)
-val Orange100 = Color(0xFFFFF7ED)
-val GrayBg = Color(0xFFF3F4F6)
-val GrayCard = Color(0xFFE5E7EB)
-val TextPrimary = Color(0xFF111827)
-val TextSecond = Color(0xFF6B7280)
-
-// ── Main Screen ───────────────────────────────────────────────────────────────
 @Composable
 fun HomeScreen() {
     // Force RTL for Arabic content
