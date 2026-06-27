@@ -33,8 +33,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import com.vtol.zaka.R
-import com.vtol.zaka.domain.models.QuizResult
-import com.vtol.zaka.domain.models.Subject
+import com.vtol.zaka.domain.models.quiz.QuizResult
+import com.vtol.zaka.domain.models.quiz.Subject
 import com.vtol.zaka.ui.theme.GrayBg
 import com.vtol.zaka.ui.theme.GrayCard
 import com.vtol.zaka.ui.theme.Green500

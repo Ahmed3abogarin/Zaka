@@ -1,7 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.0.21"
+    alias(libs.plugins.google.gms.google.services)
+
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -45,6 +49,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.firebase.ai)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -61,5 +66,14 @@ dependencies {
 
     //
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+
+    // Hilt
+    // 1. Core Hilt Dependencies
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // 2. Jetpack Compose Integration (CRITICAL)
+    // This allows you to call hiltViewModel() inside your Composable screens
+    implementation(libs.androidx.hilt.navigation.compose)
 
 }

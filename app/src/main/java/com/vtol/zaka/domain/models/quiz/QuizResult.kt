@@ -1,4 +1,4 @@
-package com.vtol.zaka.domain.models
+package com.vtol.zaka.domain.models.quiz
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color

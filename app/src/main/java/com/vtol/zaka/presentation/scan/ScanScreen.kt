@@ -23,7 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.vtol.zaka.domain.models.ScanHistoryItem
+import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
 import com.vtol.zaka.presentation.scan.components.ScanHistorySection
@@ -36,7 +38,7 @@ import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
-fun ScanScreen() {
+fun ScanScreen(viewModel: QuizViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     // PDF picker
@@ -49,7 +51,7 @@ fun ScanScreen() {
                 ?.readBytes()
 
             if (bytes != null) {
-
+                viewModel.generateFromPdf(bytes)
             }
         }
     }
