@@ -26,7 +26,9 @@ import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
-fun CameraButton() {
+fun CameraButton(
+    onClick: () -> Unit
+) {
     Box(contentAlignment = Alignment.Center) {
         // Outer glow ring
         Box(
@@ -50,7 +52,7 @@ fun CameraButton() {
                         colors = listOf(Purple500, Purple700)
                     )
                 )
-                .clickable {},
+                .clickable { onClick() },
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -62,10 +64,10 @@ fun CameraButton() {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text       = "افتح الكاميرا",
-                    fontSize   = 14.sp,
+                    text = "افتح الكاميرا",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color      = Color.White,
+                    color = Color.White,
                 )
             }
         }

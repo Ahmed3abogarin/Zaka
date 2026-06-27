@@ -25,16 +25,17 @@ import com.vtol.zaka.ui.theme.TextPrimary
 
 @Composable
 fun SecondaryActionCard(
+    modifier: Modifier = Modifier,
     label: String,
     icon: ImageVector,
-    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .border(0.5.dp, BorderColor, RoundedCornerShape(16.dp))
             .background(GrayBg)
-            .clickable {}
+            .clickable { onClick() }
             .padding(vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -46,10 +47,10 @@ fun SecondaryActionCard(
             modifier = Modifier.size(28.dp),
         )
         Text(
-            text       = label,
-            fontSize   = 14.sp,
+            text = label,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color      = TextPrimary,
+            color = TextPrimary,
         )
     }
 }

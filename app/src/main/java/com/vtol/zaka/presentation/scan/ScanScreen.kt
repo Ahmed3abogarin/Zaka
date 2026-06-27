@@ -1,5 +1,8 @@
 package com.vtol.zaka.presentation.scan
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +15,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.domain.models.ScanHistoryItem
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
 import com.vtol.zaka.presentation.scan.components.ScanHistorySection
@@ -31,33 +35,58 @@ import com.vtol.zaka.ui.theme.Teal400
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
-// ── Data model ────────────────────────────────────────────────────────────────
-data class ScanHistoryItem(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val iconBg: Color,
-    val iconTint: Color,
-)
-
-// ── Screen ────────────────────────────────────────────────────────────────────
 @Composable
 fun ScanScreen() {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    val context = LocalContext.current
 
+    // PDF picker
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val bytes = context.contentResolver
+                .openInputStream(it)
+                ?.readBytes()
+
+            if (bytes != null) {
+
+            }
+        }
+    }
+
+    // Camera picker
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+
+        }
+    }
+
+    // gallery launcher
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+
+        }
+    }
+
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         val history = listOf(
             ScanHistoryItem(
-                title    = "ملخص الكيمياء.pdf",
+                title = "ملخص الكيمياء.pdf",
                 subtitle = "منذ ساعتين",
-                icon     = Icons.Outlined.PictureAsPdf,
-                iconBg   = Teal100,
+                icon = Icons.Outlined.PictureAsPdf,
+                iconBg = Teal100,
                 iconTint = Teal400,
             ),
             ScanHistoryItem(
-                title    = "صفحة ٤٢ - فيزياء",
+                title = "صفحة ٤٢ - فيزياء",
                 subtitle = "يوم أمس",
-                icon     = Icons.Outlined.Image,
-                iconBg   = Purple100,
+                icon = Icons.Outlined.Image,
+                iconBg = Purple100,
                 iconTint = Purple500,
             )
         )
@@ -82,17 +111,17 @@ fun ScanScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text       = "امسح ملاحظاتك",
-                        fontSize   = 22.sp,
+                        text = "امسح ملاحظاتك",
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color      = TextPrimary,
-                        textAlign  = TextAlign.Center,
+                        color = TextPrimary,
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text      = "حوّل أوراقك الدراسية إلى ملخصات ذكية في ثوان",
-                        fontSize  = 14.sp,
-                        color     = TextSecond,
+                        text = "حوّل أوراقك الدراسية إلى ملخصات ذكية في ثوان",
+                        fontSize = 14.sp,
+                        color = TextSecond,
                         textAlign = TextAlign.Center,
                         lineHeight = 22.sp,
                     )
@@ -102,7 +131,7 @@ fun ScanScreen() {
             item { Spacer(Modifier.height(40.dp)) }
 
             // ── Camera button ─────────────────────────────────────────────────
-            item { CameraButton() }
+            item { CameraButton { cameraLauncher.launch(null) } }
 
             item { Spacer(Modifier.height(40.dp)) }
 
@@ -115,14 +144,20 @@ fun ScanScreen() {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SecondaryActionCard(
-                        label    = "من المعرض",
-                        icon     = Icons.Outlined.Image,
+                        label = "من المعرض",
+                        icon = Icons.Outlined.Image,
                         modifier = Modifier.weight(1f),
+                        onClick = {
+                            galleryLauncher.launch("image/*")
+                        }
                     )
                     SecondaryActionCard(
-                        label    = "ملف PDF",
-                        icon     = Icons.Outlined.PictureAsPdf,
+                        label = "ملف PDF",
+                        icon = Icons.Outlined.PictureAsPdf,
                         modifier = Modifier.weight(1f),
+                        onClick = {
+                            pdfLauncher.launch("application/pdf")
+                        }
                     )
                 }
             }
@@ -139,7 +174,7 @@ fun ScanScreen() {
             // ── Scan history ──────────────────────────────────────────────────
             item {
                 ScanHistorySection(
-                    items    = history,
+                    items = history,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
             }
