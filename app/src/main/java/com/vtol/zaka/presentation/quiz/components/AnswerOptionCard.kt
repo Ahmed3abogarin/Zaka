@@ -16,9 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vtol.zaka.presentation.quiz.AnswerIndicator
-import com.vtol.zaka.presentation.quiz.answerColors
 import com.vtol.zaka.presentation.quiz.model.AnswerState
+import com.vtol.zaka.presentation.quiz.model.QuizOption
+import com.vtol.zaka.presentation.quiz.model.answerColors
 
 @Composable
 fun AnswerOptionCard(

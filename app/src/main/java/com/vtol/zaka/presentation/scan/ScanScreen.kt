@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.vtol.zaka.domain.models.ScanHistoryItem
 import com.vtol.zaka.presentation.quiz.QuizUiEffect
 import com.vtol.zaka.presentation.quiz.QuizViewModel
