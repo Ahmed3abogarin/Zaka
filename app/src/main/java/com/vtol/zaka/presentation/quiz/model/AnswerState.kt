@@ -3,7 +3,7 @@ package com.vtol.zaka.presentation.quiz.model
 import androidx.compose.ui.graphics.Color
 import com.vtol.zaka.ui.theme.BorderDefault
 import com.vtol.zaka.ui.theme.GreenLight
-import com.vtol.zaka.ui.theme.GreenSuccess
+import com.vtol.zaka.ui.theme.Green500
 import com.vtol.zaka.ui.theme.Purple50
 import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.RedError
@@ -27,7 +27,7 @@ data class AnswerColors(
 fun answerColors(state: AnswerState) = when (state) {
     AnswerState.IDLE             -> AnswerColors(Color.White,  BorderDefault, TextPrimary,  Purple500)
     AnswerState.SELECTED         -> AnswerColors(Purple50,     Purple500,     Purple500,    Purple500)
-    AnswerState.CORRECT          -> AnswerColors(GreenLight,   GreenSuccess,  GreenSuccess, GreenSuccess)
+    AnswerState.CORRECT          -> AnswerColors(GreenLight,   Green500,  Green500, Green500)
     AnswerState.WRONG            -> AnswerColors(RedLight,     RedError,      RedError,     RedError)
-    AnswerState.REVEALED_CORRECT -> AnswerColors(GreenLight,   GreenSuccess,  GreenSuccess, GreenSuccess)
+    AnswerState.REVEALED_CORRECT -> AnswerColors(GreenLight,   Green500,  Green500, Green500)
 }

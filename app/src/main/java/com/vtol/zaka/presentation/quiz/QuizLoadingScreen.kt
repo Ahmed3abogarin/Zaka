@@ -1,86 +1,43 @@
 package com.vtol.zaka.presentation.quiz
 
-import android.app.Activity
-import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.presentation.quiz.model.LoadingSource
+import com.vtol.zaka.presentation.quiz.model.getFunFacts
+import com.vtol.zaka.presentation.quiz.model.imageSteps
+import com.vtol.zaka.presentation.quiz.model.pdfSteps
+import com.vtol.zaka.presentation.quiz.model.topicSteps
+import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.GrayBg
+import com.vtol.zaka.ui.theme.Green500
+import com.vtol.zaka.ui.theme.Purple300
+import com.vtol.zaka.ui.theme.Purple500
+import com.vtol.zaka.ui.theme.Purple700
+import com.vtol.zaka.ui.theme.TextPrimary
+import com.vtol.zaka.ui.theme.TextSecond
+import com.vtol.zaka.ui.theme.ZakaTheme
 import kotlinx.coroutines.delay
-
-// ─── Loading Step ─────────────────────────────────────────────────────────────
-data class LoadingStep(
-    val icon: String,
-    val titleAr: String,
-    val descriptionAr: String,
-    val durationMs: Long = 1500
-)
-
-// ─── Steps per source ─────────────────────────────────────────────────────────
-val pdfSteps = listOf(
-    LoadingStep("📄", "قراءة الملف",       "جاري فتح وتحليل ملف PDF",              1500),
-    LoadingStep("🔍", "استخراج المحتوى",   "الذكاء الاصطناعي يقرأ المحتوى",        2000),
-    LoadingStep("🧠", "فهم المادة",        "تحليل المفاهيم الرئيسية",              1500),
-    LoadingStep("✍️", "إنشاء الأسئلة",    "توليد أسئلة مخصصة لك",               2000),
-    LoadingStep("✅", "جاهز!",             "اختبارك جاهز للبدء",                  800)
-)
-
-val imageSteps = listOf(
-    LoadingStep("🖼️", "تحليل الصورة",     "جاري فحص محتوى الصورة",               1500),
-    LoadingStep("📝", "قراءة النص",        "استخراج النص من الصورة",               2000),
-    LoadingStep("🧠", "فهم المحتوى",       "الذكاء الاصطناعي يحلل المادة",         1500),
-    LoadingStep("✍️", "إنشاء الأسئلة",    "توليد أسئلة مخصصة لك",               2000),
-    LoadingStep("✅", "جاهز!",             "اختبارك جاهز للبدء",                  800)
-)
-
-val topicSteps = listOf(
-    LoadingStep("📚", "اختيار الموضوع",    "تحضير محتوى الموضوع",                 1000),
-    LoadingStep("🧠", "توليد الأسئلة",     "الذكاء الاصطناعي يبدع أسئلة ذكية",    2000),
-    LoadingStep("🎯", "ضبط الصعوبة",       "تخصيص مستوى الأسئلة لك",              1500),
-    LoadingStep("✅", "جاهز!",             "اختبارك جاهز للبدء",                  800)
-)
-
-// ─── Fun facts per topic ──────────────────────────────────────────────────────
-fun getFunFacts(topic: String): List<String> = when {
-    topic.contains("علوم") || topic.contains("كيمياء") || topic.contains("فيزياء") -> listOf(
-        "الأكسجين يشكّل نحو 46% من كتلة القشرة الأرضية",
-        "الضوء يسافر بسرعة 300,000 كيلومتر في الثانية",
-        "جسم الإنسان يحتوي على ما يكفي من الكربون لصنع 900 قلم رصاص"
-    )
-    topic.contains("رياضيات") -> listOf(
-        "الرقم صفر اخترعه علماء العرب وأدخلوه إلى أوروبا",
-        "π (باي) يحتوي على لا نهاية من الأرقام بعد الفاصلة",
-        "مجموع زوايا أي مثلث يساوي 180 درجة دائماً"
-    )
-    topic.contains("تاريخ") -> listOf(
-        "بغداد كانت أكبر مدينة في العالم في القرن العاشر الميلادي",
-        "ابن بطوطة قطع مسافة أكبر من ماركو بولو بثلاثة أضعاف",
-        "الحضارة الإسلامية أنقذت كثيراً من العلوم اليونانية من الضياع"
-    )
-    topic.contains("لغة") -> listOf(
-        "اللغة العربية من أكثر اللغات ثراءً في العالم بعدد مفرداتها",
-        "يوجد أكثر من 400 مليون متحدث باللغة العربية حول العالم",
-        "القرآن الكريم أقوى عامل في الحفاظ على اللغة العربية عبر القرون"
-    )
-    else -> listOf(
-        "المذاكرة المنتظمة أفضل بكثير من الحشو قبل الامتحان",
-        "النوم الكافي يساعد الدماغ على تثبيت المعلومات",
-        "تقسيم المادة إلى أجزاء صغيرة يجعل الحفظ أسهل",
-        "الاختبار الذاتي من أفضل طرق المراجعة الفعالة"
-    )
-}
 
 @Composable
 fun QuizLoadingContent(
@@ -89,10 +46,12 @@ fun QuizLoadingContent(
     state: QuizUiState,
     onReadyToNavigate: () -> Unit
 ) {
+    // TODO: Integrate the interstitial ad and the navigation logic
+
     val context = LocalContext.current
     val steps = remember(source) {
         when (source) {
-            LoadingSource.PDF   -> pdfSteps
+            LoadingSource.PDF -> pdfSteps
             LoadingSource.IMAGE -> imageSteps
             LoadingSource.TOPIC -> topicSteps
         }
@@ -100,9 +59,9 @@ fun QuizLoadingContent(
     val funFacts = remember(topic) { getFunFacts(topic) }
 
     // ─── Local UI state ───────────────────────────────────────────────────
-    var currentStep    by remember { mutableStateOf(0) }
-    var currentFact    by remember { mutableStateOf(0) }
-    var adShown        by remember { mutableStateOf(false) }
+    var currentStep by remember { mutableIntStateOf(0) }
+    var currentFact by remember { mutableIntStateOf(0) }
+    var adShown by remember { mutableStateOf(false) }
 
     // ─── Animate steps independently from AI ──────────────────────────────
     LaunchedEffect(Unit) {
@@ -133,55 +92,102 @@ fun QuizLoadingContent(
         }
     }
 
-    // ─── UI Layout Tree ───────────────────────────────────────────────────
+    val infiniteTransition = rememberInfiniteTransition(label = "bg_blobs")
+
+    val blob1Y by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "blob1_y"
+    )
+
+    val blob2Y by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(5500, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "blob2_y"
+    )
+
+    val blob3Y by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3800, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "blob3_y"
+    )
+
+    // ─── UI Layout Tree ──────────────────────────────────────────────────
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E)),
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
+        // Top-start purple blob
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .size(340.dp)
+                .graphicsLayer {
+                    translationX = 82.dp.toPx()
+                    translationY = blob1Y.dp.toPx()
+                }
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Purple500.copy(alpha = 0.4f), Color.Transparent)
+                    ),
+                    shape = CircleShape,
+                )
+        )
+
+// Center-start blue blob
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .size(340.dp)
+                .graphicsLayer {
+                    translationX = (-72).dp.toPx()
+                    translationY = blob2Y.dp.toPx()
+                }
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFFE2F9FE), Color.Transparent)
+                    ),
+                    shape = CircleShape,
+                )
+        )
+
+// Bottom-end pink blob
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(340.dp)
+                .graphicsLayer {
+                    translationX = blob3Y.dp.toPx()
+                }
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFFFEE1FC), Color.Transparent)
+                    ),
+                    shape = CircleShape,
+                )
+        )
+
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
         ) {
-
-            // ─── Spinner + app icon ───────────────────────────────────────
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(90.dp)
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(90.dp),
-                    color = Color(0xFF7F77DD),
-                    trackColor = Color(0xFF2A2A4A),
-                    strokeWidth = 3.dp
-                )
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF534AB7)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "Z",
-                            fontSize = 24.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 26.sp
-                        )
-                        Text(
-                            text = "ذكاء",
-                            fontSize = 9.sp,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(28.dp))
 
             // ─── Animated current step ────────────────────────────────────
@@ -198,17 +204,29 @@ fun QuizLoadingContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(text = it.icon, fontSize = 34.sp)
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(90.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(90.dp),
+                                color = Color(0xFF7F77DD),
+                                trackColor = Color(0xFF2A2A4A),
+                                strokeWidth = 3.dp
+                            )
+                            Text(text = it.icon, fontSize = 32.sp)
+
+                        }
                         Text(
                             text = it.titleAr,
-                            fontSize = 17.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = TextPrimary
                         )
                         Text(
                             text = it.descriptionAr,
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.5f),
+                            color = TextSecond,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -221,16 +239,16 @@ fun QuizLoadingContent(
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 steps.forEachIndexed { index, _ ->
                     val isActive = index == currentStep
-                    val isDone   = index < currentStep
+                    val isDone = index < currentStep
                     Box(
                         modifier = Modifier
                             .size(if (isActive) 10.dp else 6.dp)
                             .clip(RoundedCornerShape(50))
                             .background(
                                 when {
-                                    isDone   -> Color(0xFF1D9E75)
-                                    isActive -> Color(0xFF7F77DD)
-                                    else     -> Color(0xFF2A2A4A)
+                                    isDone -> Purple700
+                                    isActive -> Purple300
+                                    else -> Color(0xFF2A2A4A)
                                 }
                             )
                     )
@@ -244,12 +262,13 @@ fun QuizLoadingContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF2A2A4A))
+                    .border(width = 0.5.dp, color = BorderDefault, RoundedCornerShape(14.dp))
+                    .background(GrayBg)
                     .padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 steps.forEachIndexed { index, step ->
-                    val isDone   = index < currentStep
+                    val isDone = index < currentStep
                     val isActive = index == currentStep
 
                     AnimatedVisibility(
@@ -267,32 +286,38 @@ fun QuizLoadingContent(
                                     .clip(RoundedCornerShape(50))
                                     .background(
                                         when {
-                                            isDone   -> Color(0xFF1D9E75)
-                                            isActive -> Color(0xFF534AB7)
-                                            else     -> Color(0xFF3A3A5A)
+                                            isDone -> Purple700
+                                            else -> Color.Transparent
                                         }
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 when {
-                                    isDone   -> Text("✓", fontSize = 11.sp, color = Color.White)
+                                    isDone -> Icon(
+                                        modifier = Modifier.padding(4.dp),
+                                        tint = Color.White,
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null
+                                    )
+
                                     isActive -> CircularProgressIndicator(
-                                        modifier  = Modifier.size(12.dp),
-                                        color     = Color.White,
-                                        strokeWidth = 1.5.dp
+                                        modifier = Modifier.fillMaxSize(),
+                                        color = Purple700,
+                                        strokeWidth = 2.5.dp,
+                                        trackColor = Color.LightGray
                                     )
                                 }
                             }
 
                             Text(
                                 text = step.titleAr,
-                                fontSize = 12.sp,
+                                fontSize = 15.sp,
                                 color = when {
-                                    isDone   -> Color(0xFF5DCAA5)
-                                    isActive -> Color.White
-                                    else     -> Color.White.copy(alpha = 0.3f)
+                                    isDone -> Green500
+                                    isActive -> TextPrimary
+                                    else -> TextSecond
                                 },
-                                fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal,
+                                fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier
                                     .weight(1f)
@@ -318,22 +343,27 @@ fun QuizLoadingContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF2A2A4A))
+                            .border(
+                                width = 0.5.dp,
+                                color = BorderDefault,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .background(GrayBg)
                             .padding(14.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(
                                 text = "💡 هل تعلم؟",
-                                fontSize = 11.sp,
-                                color = Color(0xFF7F77DD),
-                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Purple700,
+                                fontWeight = FontWeight.Bold,
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Right
                             )
                             Text(
                                 text = it,
                                 fontSize = 11.sp,
-                                color = Color.White.copy(alpha = 0.6f),
+                                color = TextSecond,
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier.fillMaxWidth(),
                                 lineHeight = 18.sp
@@ -367,4 +397,12 @@ fun QuizLoadingContent(
     }
 }
 
-enum class LoadingSource { PDF, IMAGE, TOPIC }
+@Preview
+@Composable
+fun LoadingPreview() {
+    ZakaTheme {
+        QuizLoadingContent(
+            state = QuizUiState()
+        ) { }
+    }
+}
