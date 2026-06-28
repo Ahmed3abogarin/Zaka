@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.home.HomeScreen
 import com.vtol.zaka.presentation.quiz.QuizScreen
 import com.vtol.zaka.presentation.quiz.QuizViewModel
+import com.vtol.zaka.presentation.result.ResultScreen
 import com.vtol.zaka.presentation.scan.ScanScreen
 import kotlinx.serialization.Serializable
 
@@ -102,12 +104,37 @@ fun MainScreen() {
                         navController.getBackStackEntry<QuizGraphRoute>()
                     }
                     val viewModel: QuizViewModel = hiltViewModel(parentEntry)
-                    QuizScreen(viewModel = viewModel)
+                    QuizScreen(
+                        viewModel = viewModel,
+                        navigateToResult = { navController.navigate(ResultRoute) })
+                }
+
+                composable<ResultRoute> { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry<QuizGraphRoute>()
+                    }
+
+                    val viewModel: QuizViewModel = hiltViewModel(parentEntry)
+
+                    val state by viewModel.state.collectAsState()
+
+                    ResultScreen(
+                        state = state,
+                        onHome = { navController.navigate(HomeRoute)},
+                        retakeQuiz = {
+                            viewModel.retakeQuiz()
+                            navController.navigate(QuizRoute)
+                        }
+                    )
+
                 }
             }
         }
     }
 }
+
+@Serializable
+object ResultRoute
 
 @Serializable
 object QuizGraphRoute

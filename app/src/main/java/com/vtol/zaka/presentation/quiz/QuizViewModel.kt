@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.domain.models.quiz.Question
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
+import com.vtol.zaka.presentation.quiz.model.QuestionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -35,8 +36,8 @@ class QuizViewModel @Inject constructor(
             QuizEvent.NextQuestion -> nextQuestion()
             QuizEvent.RevealAnswer -> revealAnswer()
             is QuizEvent.SelectAnswer -> selectAnswer(event.index)
-            QuizEvent.StopTimer -> stopTimer()
             QuizEvent.StartTimer -> startTimer()
+            QuizEvent.RetakeQuiz -> retakeQuiz()
         }
     }
 
@@ -78,16 +79,21 @@ class QuizViewModel @Inject constructor(
             it.copy(selectedIndex = if (it.selectedIndex == index) null else index)
         }
     }
-
     fun revealAnswer() {
-        if (_state.value.isRevealed) return
+        if (!_state.value.answered || _state.value.isRevealed) return
+        val current = _state.value.currentQuestion ?: return
+        val selected = _state.value.selectedIndex ?: return
+        val isCorrect = selected == current.correctIndex
 
-        val isCorrect = _state.value.selectedIndex ==
-                _state.value.currentQuestion?.correctIndex
         _state.update {
             it.copy(
-                isRevealed = true,
-                correctCount = if (isCorrect) it.correctCount + 1 else it.correctCount
+                isRevealed    = true,
+                correctCount  = if (isCorrect) it.correctCount + 1 else it.correctCount,
+                questionResults = it.questionResults + QuestionResult(
+                    question      = current,
+                    selectedIndex = selected,
+                    isCorrect     = isCorrect,
+                )
             )
         }
     }
@@ -131,9 +137,14 @@ class QuizViewModel @Inject constructor(
         timerJob?.cancel()
     }
 
-    fun resetQuiz() {
-        stopTimer()
-        _state.value = QuizUiState()
+    fun retakeQuiz() {
+        val questions = _state.value.questions
+
+        _state.value = QuizUiState(
+            screenState = QuizScreenState.Ready,
+            questions = questions
+        )
+
     }
 
     override fun onCleared() {
@@ -152,6 +163,7 @@ sealed class QuizScreenState {
 data class QuizUiState(
     val screenState: QuizScreenState = QuizScreenState.Loading,
     val questions: List<Question> = emptyList(),
+    val questionResults: List<QuestionResult> = emptyList(),
     val currentQuestionIndex: Int = 0,
     val correctCount: Int = 0,
     val selectedIndex: Int? = null,

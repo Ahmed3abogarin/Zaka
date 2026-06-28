@@ -4,6 +4,6 @@ sealed class QuizEvent {
     object NextQuestion: QuizEvent()
     object RevealAnswer: QuizEvent()
     object StartTimer: QuizEvent()
-    object StopTimer: QuizEvent()
+    object RetakeQuiz: QuizEvent()
     data class SelectAnswer(val index: Int): QuizEvent()
 }

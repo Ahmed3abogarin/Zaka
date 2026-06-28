@@ -13,9 +13,20 @@ import androidx.compose.ui.unit.dp
 fun QuizScreen(
     viewModel: QuizViewModel,
     onClose: () -> Unit = {},
+    navigateToResult: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect {
+            when(it){
+                QuizUiEffect.NavigateToResult -> navigateToResult()
+            }
+
+        }
+
+    }
 
     when (state.screenState) {
         is QuizScreenState.Loading -> {
@@ -40,7 +51,7 @@ fun QuizScreen(
                     modifier = Modifier.padding(16.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
-                Button(onClick = { viewModel.resetQuiz() }) {
+                Button(onClick = {  }) {
                     Text("إعادة المحاولة")
                 }
             }

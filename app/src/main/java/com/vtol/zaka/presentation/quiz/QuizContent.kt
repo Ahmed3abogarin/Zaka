@@ -39,6 +39,10 @@ fun QuizContent(
     event: (QuizEvent) -> Unit,
     onClose: () -> Unit
 ) {
+
+    LaunchedEffect(Unit) {
+        event(QuizEvent.StartTimer)
+    }
     val currentQuestion = state.currentQuestion
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         if (currentQuestion == null) {
@@ -142,6 +146,7 @@ fun QuizContent(
 
                 // Next / Finish button
                 NextButton(
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 6.dp),
                     label = when {
                         !state.isRevealed -> "تحقق من الإجابة"   // Check answer
                         state.isLastQuestion -> "إنهاء الاختبار"    // End test
@@ -151,13 +156,9 @@ fun QuizContent(
                     onClick = {
                         when {
                             !state.isRevealed -> event(QuizEvent.RevealAnswer)
-                            state.isLastQuestion -> {
-                                event(QuizEvent.StopTimer)
-                            }
-
                             else -> event(QuizEvent.NextQuestion)
                         }
-                    },
+                    }
                 )
             }
         }
