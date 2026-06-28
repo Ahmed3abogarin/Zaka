@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "65313129706",
+    "project_id": "zaka-4345c",
+    "storage_bucket": "zaka-4345c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65313129706:android:d204a67668d4dc78444393",
+        "android_client_info": {
+          "package_name": "com.vtol.zaka"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB96AmyV7eEwz9HqKmKLZnV_9-VELHyj78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

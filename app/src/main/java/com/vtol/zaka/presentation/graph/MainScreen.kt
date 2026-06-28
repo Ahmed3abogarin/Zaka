@@ -29,45 +29,52 @@ import com.vtol.zaka.presentation.scan.ScanScreen
 import kotlinx.serialization.Serializable
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen() {
     val navController = rememberNavController()
     val tabs = listOf(
         BottomNavItem("Home", Icons.Default.Home, HomeRoute),
         BottomNavItem("Scan", Icons.Default.Person, ScanRoute),
     )
 
+
+    // 2. Extract the current destination route path
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                // Observe the current back stack to determine which tab is selected
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
+            // Observe the current back stack to determine which tab is selected
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
 
-                tabs.forEach { tab ->
-                    // Navigation 2.8+ way to check if the current route matches the tab
-                    val isSelected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(tab.route::class)
-                    } == true
-
-                    ShortNavigationBarItem(
-                        modifier = Modifier.weight(1f),
-                        selected = isSelected,
-                        label = { Text(tab.title) },
-                        icon = { Icon(tab.icon, contentDescription = tab.title) },
-                        onClick = {
-                            navController.navigate(tab.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies of the same destination
-                                launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
-                                restoreState = true
-                            }
+            val showBottomNav = currentDestination?.hasRoute<HomeRoute>() == true ||
+                    currentDestination?.hasRoute<ScanRoute>() == true
+            if (showBottomNav) {
+                NavigationBar {
+                    tabs.forEach { tab ->
+                        // Navigation 2.8+ way to check if the current route matches the tab
+                        val isSelected = currentDestination.hierarchy.any {
+                            it.hasRoute(tab.route::class)
                         }
-                    )
+
+                        ShortNavigationBarItem(
+                            modifier = Modifier.weight(1f),
+                            selected = isSelected,
+                            label = { Text(tab.title) },
+                            icon = { Icon(tab.icon, contentDescription = tab.title) },
+                            onClick = {
+                                navController.navigate(tab.route) {
+                                    // Pop up to the start destination of the graph to
+                                    // avoid building up a large stack of destinations
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -104,8 +111,10 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
 @Serializable
 object QuizGraphRoute
+
 @Serializable
 object QuizRoute
+
 @Serializable
 object ScanRoute
 
