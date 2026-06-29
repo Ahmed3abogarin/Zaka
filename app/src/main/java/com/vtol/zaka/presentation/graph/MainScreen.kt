@@ -5,11 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShortNavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +22,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.details.QuizDetailScreen
 import com.vtol.zaka.presentation.details.QuizDetailsViewModel
+import com.vtol.zaka.presentation.graph.components.ArabicBottomNavBar
 import com.vtol.zaka.presentation.home.HomeScreen
 import com.vtol.zaka.presentation.home.HomeViewModel
 import com.vtol.zaka.presentation.progress.ProgressScreen
@@ -57,34 +54,23 @@ fun MainScreen() {
                     currentDestination?.hasRoute<ScanRoute>() == true || currentDestination?.hasRoute<ProgressRoute>() == true
 
             if (showBottomNav) {
-                NavigationBar {
-                    tabs.forEach { tab ->
-                        // Navigation 2.8+ way to check if the current route matches the tab
-                        val isSelected = currentDestination.hierarchy.any {
-                            it.hasRoute(tab.route::class)
-                        }
+                val selectedIndex = tabs.indexOfFirst { tab ->
+                    currentDestination.hierarchy.any { it.hasRoute(tab.route::class) }
+                }.coerceAtLeast(0)
 
-                        ShortNavigationBarItem(
-                            modifier = Modifier.weight(1f),
-                            selected = isSelected,
-                            label = { Text(tab.title) },
-                            icon = { Icon(tab.icon, contentDescription = tab.title) },
-                            onClick = {
-                                navController.navigate(tab.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    // Avoid multiple copies of the same destination
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                    restoreState = true
-                                }
+                ArabicBottomNavBar(
+                    selectedIndex = selectedIndex,
+                    onItemSelected = { index ->
+                        navController.navigate(tabs[index].route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
                             }
-                        )
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                }
+                )
+
             }
         }
     ) { innerPadding ->
