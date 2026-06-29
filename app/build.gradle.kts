@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation(libs.kotlinx.serialization.json)
 
     // Hilt
     // 1. Core Hilt Dependencies
@@ -75,5 +75,11 @@ dependencies {
     // 2. Jetpack Compose Integration (CRITICAL)
     // This allows you to call hiltViewModel() inside your Composable screens
     implementation(libs.androidx.hilt.navigation.compose)
+
+
+    // Room DB
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
 }

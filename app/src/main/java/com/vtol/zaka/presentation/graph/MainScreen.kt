@@ -2,6 +2,7 @@ package com.vtol.zaka.presentation.graph
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -24,6 +25,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.home.HomeScreen
+import com.vtol.zaka.presentation.progress.ProgressScreen
+import com.vtol.zaka.presentation.progress.ProgressViewModel
 import com.vtol.zaka.presentation.quiz.QuizScreen
 import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.result.ResultScreen
@@ -36,11 +39,11 @@ fun MainScreen() {
     val tabs = listOf(
         BottomNavItem("Home", Icons.Default.Home, HomeRoute),
         BottomNavItem("Scan", Icons.Default.Person, ScanRoute),
+        BottomNavItem("Progress", Icons.Default.BarChart, ProgressRoute)
     )
 
 
     // 2. Extract the current destination route path
-
     Scaffold(
         bottomBar = {
             // Observe the current back stack to determine which tab is selected
@@ -48,7 +51,8 @@ fun MainScreen() {
             val currentDestination = navBackStackEntry?.destination
 
             val showBottomNav = currentDestination?.hasRoute<HomeRoute>() == true ||
-                    currentDestination?.hasRoute<ScanRoute>() == true
+                    currentDestination?.hasRoute<ScanRoute>() == true || currentDestination?.hasRoute<ProgressRoute>() == true
+
             if (showBottomNav) {
                 NavigationBar {
                     tabs.forEach { tab ->
@@ -120,7 +124,7 @@ fun MainScreen() {
 
                     ResultScreen(
                         state = state,
-                        onHome = { navController.navigate(HomeRoute)},
+                        onHome = { navController.navigate(HomeRoute) },
                         retakeQuiz = {
                             viewModel.retakeQuiz()
                             navController.navigate(QuizRoute)
@@ -128,10 +132,21 @@ fun MainScreen() {
                     )
 
                 }
+
+                composable<ProgressRoute> {
+                    val viewModel: ProgressViewModel = hiltViewModel()
+
+                    val stats by viewModel.stats.collectAsState()
+
+                    ProgressScreen(stats)
+                }
             }
         }
     }
 }
+
+@Serializable
+object ProgressRoute
 
 @Serializable
 object ResultRoute

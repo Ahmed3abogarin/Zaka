@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.domain.models.quiz.Question
+import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val generateFromPdfUseCase: GenerateFromPdfUseCase
+    private val generateFromPdfUseCase: GenerateFromPdfUseCase,
+    private val saveQuizSessionUseCase: SaveQuizSessionUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QuizUiState())
@@ -103,6 +105,7 @@ class QuizViewModel @Inject constructor(
         if (state.isLastQuestion) {
             viewModelScope.launch {
                 stopTimer()
+                saveQuizSessionUseCase(state)
                 _uiEffect.trySend(QuizUiEffect.NavigateToResult)
             }
             return
