@@ -1,7 +1,6 @@
 package com.vtol.zaka.domain.models.quiz
 
 import androidx.annotation.DrawableRes
-import androidx.compose.ui.graphics.Color
 import com.vtol.zaka.R
 data class Subject(val label: String, @param:DrawableRes val icon: Int)
 

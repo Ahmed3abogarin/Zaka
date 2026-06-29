@@ -28,16 +28,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.domain.models.quiz.Difficulty
+import com.vtol.zaka.domain.models.quiz.Question
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
 import com.vtol.zaka.ui.theme.BorderDefault
 import com.vtol.zaka.ui.theme.Green500
-import com.vtol.zaka.ui.theme.GreenLight
 import com.vtol.zaka.ui.theme.RedError
-import com.vtol.zaka.ui.theme.RedLight
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
+import com.vtol.zaka.ui.theme.ZakaTheme
 
 @Composable
 fun QuestionReviewCard(
@@ -46,7 +48,7 @@ fun QuestionReviewCard(
     modifier: Modifier = Modifier,
 ) {
     val accentColor = if (result.isCorrect) Green500 else RedError
-    val bgColor = if (result.isCorrect) GreenLight else RedLight
+//    val bgColor = if (result.isCorrect) GreenLight else RedLight
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -161,5 +163,27 @@ fun QuestionReviewCard(
                 }
             }
         }
+    }
+}
+
+
+@Preview
+@Composable
+fun ReviewCardPreview(){
+    ZakaTheme {
+        QuestionReviewCard(
+            index = 0,
+            QuestionResult(
+                selectedIndex = 0,
+                question = Question("Ggs",
+                    "gsdg",
+                    listOf(""),
+                    0,
+                    "","" ,
+                    Difficulty.MEDIUM
+                ),
+                isCorrect = false
+            )
+        )
     }
 }

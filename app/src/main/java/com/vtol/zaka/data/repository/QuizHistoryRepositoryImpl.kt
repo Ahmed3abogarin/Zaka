@@ -72,14 +72,14 @@ class QuizHistoryRepositoryImpl @Inject constructor(
                 Result.success(
                     session.results.map { result ->
                         Question(
-                            id           = "${session.session.topic}-${result.id}",
-                            text         = result.questionText,
-                            options      = JSONArray(result.options)
+                            id = "${session.session.topic}-${result.id}",
+                            text = result.questionText,
+                            options = JSONArray(result.options)
                                 .let { arr -> (0 until arr.length()).map { arr.getString(it) } },
                             correctIndex = result.correctIndex,
-                            explanation  = "",
-                            topic        = session.session.topic,
-                            difficulty   = Difficulty.MEDIUM,
+                            explanation = "",
+                            topic = session.session.topic,
+                            difficulty = Difficulty.MEDIUM,
                         )
                     }
                 )

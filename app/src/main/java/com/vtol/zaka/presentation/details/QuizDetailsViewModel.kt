@@ -44,7 +44,3 @@ sealed interface HistoryDetailUiState {
     data class Success(val session: QuizSession) : HistoryDetailUiState
     data class Error(val message: String) : HistoryDetailUiState
 }
-
-sealed interface HistoryDetailEffect {
-    data object NavigateToQuiz : HistoryDetailEffect
-}

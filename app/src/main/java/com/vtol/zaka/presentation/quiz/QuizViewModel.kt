@@ -1,7 +1,6 @@
 package com.vtol.zaka.presentation.quiz
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.domain.models.quiz.Question
