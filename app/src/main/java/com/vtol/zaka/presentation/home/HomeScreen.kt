@@ -32,9 +32,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
-import com.vtol.zaka.R
-import com.vtol.zaka.domain.models.quiz.QuizResult
+import com.vtol.zaka.domain.models.RecentQuiz
 import com.vtol.zaka.domain.models.quiz.Subject
+import com.vtol.zaka.domain.models.quiz.subjects
 import com.vtol.zaka.ui.theme.GrayBg
 import com.vtol.zaka.ui.theme.GrayCard
 import com.vtol.zaka.ui.theme.Green500
@@ -49,20 +49,10 @@ import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(recentQuizzes: List<RecentQuiz>) {
     // Force RTL for Arabic content
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        val recentQuizzes = listOf(
-            QuizResult("أساسيات الكيمياء العضوية", 0.70f, 70, Green500, Teal100, Teal400),
-            QuizResult("حساب التفاضل والتكامل", 0.45f, 45, Purple500, Purple100, Purple500),
-            QuizResult("تاريخ العصور الوسطى", 0.92f, 92, Orange400, Orange100, Orange400),
-        )
-        val subjects = listOf(
-            Subject("علوم", icon = R.drawable.ic_science),
-            Subject("لغات", icon = R.drawable.ic_science),
-            Subject("رياضيات", icon = R.drawable.ic_science),
-            Subject("تاريخ", icon = R.drawable.ic_science),
-        )
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -398,7 +388,7 @@ private fun SubjectChip(
 // ── Recent quiz card ──────────────────────────────────────────────────────────
 @Composable
 private fun RecentQuizCard(
-    quiz: QuizResult,
+    quiz: RecentQuiz,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -482,6 +472,6 @@ private fun RecentQuizCard(
 @Composable
 fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen()
+        HomeScreen(recentQuizzes = listOf())
     }
 }

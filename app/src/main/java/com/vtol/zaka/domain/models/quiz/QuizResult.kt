@@ -2,14 +2,12 @@ package com.vtol.zaka.domain.models.quiz
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
-
-data class QuizResult(
-    val title: String,
-    val progress: Float,
-    val percentage: Int,
-    val accentColor: Color,
-    val bgColor: Color,
-    val iconTint: Color,
-)
-
+import com.vtol.zaka.R
 data class Subject(val label: String, @param:DrawableRes val icon: Int)
+
+val subjects = listOf(
+    Subject("علوم", icon = R.drawable.ic_science),
+    Subject("لغات", icon = R.drawable.ic_science),
+    Subject("رياضيات", icon = R.drawable.ic_science),
+    Subject("تاريخ", icon = R.drawable.ic_science),
+)

@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.home.HomeScreen
+import com.vtol.zaka.presentation.home.HomeViewModel
 import com.vtol.zaka.presentation.progress.ProgressScreen
 import com.vtol.zaka.presentation.progress.ProgressViewModel
 import com.vtol.zaka.presentation.quiz.QuizScreen
@@ -91,7 +92,13 @@ fun MainScreen() {
             startDestination = HomeRoute,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable<HomeRoute> { HomeScreen() }
+            composable<HomeRoute> {
+                val viewModel: HomeViewModel = hiltViewModel()
+
+                val recentQuizzes by viewModel.recentQuizzes.collectAsState()
+
+                HomeScreen(recentQuizzes)
+            }
 
             navigation<QuizGraphRoute>(startDestination = ScanRoute) {
 
