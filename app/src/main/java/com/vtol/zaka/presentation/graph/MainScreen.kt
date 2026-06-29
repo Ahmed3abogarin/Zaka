@@ -24,6 +24,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.vtol.zaka.presentation.details.QuizDetailScreen
+import com.vtol.zaka.presentation.details.QuizDetailsViewModel
 import com.vtol.zaka.presentation.home.HomeScreen
 import com.vtol.zaka.presentation.home.HomeViewModel
 import com.vtol.zaka.presentation.progress.ProgressScreen
@@ -97,7 +99,9 @@ fun MainScreen() {
 
                 val recentQuizzes by viewModel.recentQuizzes.collectAsState()
 
-                HomeScreen(recentQuizzes)
+                HomeScreen(recentQuizzes) { id ->
+                    navController.navigate(QuizDetailsRoute(id))
+                }
             }
 
             navigation<QuizGraphRoute>(startDestination = ScanRoute) {
@@ -147,10 +151,31 @@ fun MainScreen() {
 
                     ProgressScreen(stats)
                 }
+
+                composable<QuizDetailsRoute> { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry<QuizGraphRoute>()
+                    }
+                    val quizViewModel: QuizViewModel = hiltViewModel(parentEntry)
+
+                    val viewModel: QuizDetailsViewModel = hiltViewModel()
+                    val state by viewModel.state.collectAsState()
+                    QuizDetailScreen(
+                        state = state,
+                        onNavigateToQuiz = { id ->
+                            quizViewModel.retakeFromHistory(id)
+                            navController.navigate(QuizRoute)
+                        }
+                    )
+                }
             }
         }
     }
 }
+
+
+@Serializable
+data class QuizDetailsRoute(val sessionId: Int)
 
 @Serializable
 object ProgressRoute

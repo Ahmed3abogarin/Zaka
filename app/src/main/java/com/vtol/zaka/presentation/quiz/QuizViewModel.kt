@@ -1,9 +1,11 @@
 package com.vtol.zaka.presentation.quiz
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.domain.models.quiz.Question
+import com.vtol.zaka.domain.usecases.RetakeQuizUseCase
 import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val generateFromPdfUseCase: GenerateFromPdfUseCase,
-    private val saveQuizSessionUseCase: SaveQuizSessionUseCase
+    private val saveQuizSessionUseCase: SaveQuizSessionUseCase,
+    private val retakeQuizUseCase: RetakeQuizUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QuizUiState())
@@ -33,8 +36,8 @@ class QuizViewModel @Inject constructor(
     private var timerJob: Job? = null
 
 
-    fun onEvent(event: QuizEvent){
-        when(event){
+    fun onEvent(event: QuizEvent) {
+        when (event) {
             QuizEvent.NextQuestion -> nextQuestion()
             QuizEvent.RevealAnswer -> revealAnswer()
             is QuizEvent.SelectAnswer -> selectAnswer(event.index)
@@ -81,6 +84,7 @@ class QuizViewModel @Inject constructor(
             it.copy(selectedIndex = if (it.selectedIndex == index) null else index)
         }
     }
+
     fun revealAnswer() {
         if (!_state.value.answered || _state.value.isRevealed) return
         val current = _state.value.currentQuestion ?: return
@@ -89,12 +93,12 @@ class QuizViewModel @Inject constructor(
 
         _state.update {
             it.copy(
-                isRevealed    = true,
-                correctCount  = if (isCorrect) it.correctCount + 1 else it.correctCount,
+                isRevealed = true,
+                correctCount = if (isCorrect) it.correctCount + 1 else it.correctCount,
                 questionResults = it.questionResults + QuestionResult(
-                    question      = current,
+                    question = current,
                     selectedIndex = selected,
-                    isCorrect     = isCorrect,
+                    isCorrect = isCorrect,
                 )
             )
         }
@@ -148,6 +152,31 @@ class QuizViewModel @Inject constructor(
             questions = questions
         )
 
+    }
+
+    fun retakeFromHistory(sessionId: Int) {
+        viewModelScope.launch {
+            retakeQuizUseCase(sessionId)
+                .fold(
+                    onSuccess = { questions ->
+                        Log.d("QuizQuestions", "size: ${questions.size}")
+                        _state.update {
+                            it.copy(questions = questions, screenState = QuizScreenState.Ready)
+                        }
+                    },
+                    onFailure = { e ->
+                        Log.d("QuizQuestions", "${e.message}")
+
+                        _state.update {
+                            it.copy(
+                                screenState = QuizScreenState.Error(
+                                    e.message ?: "حدث خطأ غير متوقع"
+                                )
+                            )
+                        }
+                    }
+                )
+        }
     }
 
     override fun onCleared() {

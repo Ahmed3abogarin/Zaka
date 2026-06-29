@@ -65,13 +65,33 @@ class QuizHistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteSession(sessionId: Int) = dao.deleteSession(sessionId)
+
+    override suspend fun getSessionWithResults(sessionId: Int): Result<List<Question>> {
+        return dao.getSessionWithResults(sessionId)
+            ?.let { session ->
+                Result.success(
+                    session.results.map { result ->
+                        Question(
+                            id           = "${session.session.topic}-${result.id}",
+                            text         = result.questionText,
+                            options      = JSONArray(result.options)
+                                .let { arr -> (0 until arr.length()).map { arr.getString(it) } },
+                            correctIndex = result.correctIndex,
+                            explanation  = "",
+                            topic        = session.session.topic,
+                            difficulty   = Difficulty.MEDIUM,
+                        )
+                    }
+                )
+            } ?: Result.failure(Exception("Session not found"))
+    }
 }
 
 private fun QuizSessionEntity.toDomain() = QuizSession(
-    id             = id,
-    topic          = topic,
+    id = id,
+    topic = topic,
     totalQuestions = totalQuestions,
-    correctCount   = correctCount,
+    correctCount = correctCount,
     elapsedSeconds = elapsedSeconds,
-    takenAt        = takenAt,
+    takenAt = takenAt,
 )
