@@ -42,8 +42,10 @@ fun ActionCard(
     description: String,
     icon: ImageVector,
     tint: Color,
+    onClick: () -> Unit
 ) {
     Card(
+        onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(width = 1.dp, color = BorderColor),
         shape = RoundedCornerShape(16.dp)
@@ -117,7 +119,7 @@ fun CardPreview() {
                 description = "التقط صورة من مذكراتك",
                 icon = Icons.Default.DocumentScanner,
                 tint = Color.Red
-            )
+            ) {}
         }
     }
 }

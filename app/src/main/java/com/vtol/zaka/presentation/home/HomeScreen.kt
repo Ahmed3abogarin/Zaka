@@ -1,5 +1,8 @@
 package com.vtol.zaka.presentation.home
 
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,8 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.domain.models.RecentQuiz
 import com.vtol.zaka.presentation.home.components.ActionCard
 import com.vtol.zaka.presentation.home.components.GreetingRow
@@ -28,7 +33,31 @@ import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
-fun HomeScreen(recentQuizzes: List<RecentQuiz>, navigateToDetails: (Int) -> Unit) {
+fun HomeScreen(
+    recentQuizzes: List<RecentQuiz>,
+    navigateToDetails: (Int) -> Unit,
+    onPdfSelected: (ByteArray, String) -> Unit,   // ← handle file directly
+    onImageCaptured: (Bitmap) -> Unit,
+) {
+
+    val context = LocalContext.current
+
+    val pdfLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val bytes = context.contentResolver.openInputStream(it)?.readBytes() ?: return@let
+            val fileName = getFileName(context, it)
+            onPdfSelected(bytes, fileName)
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let { onImageCaptured(it) }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +112,13 @@ fun HomeScreen(recentQuizzes: List<RecentQuiz>, navigateToDetails: (Int) -> Unit
                 .fillMaxSize(),
             contentPadding = PaddingValues(bottom = 32.dp),
         ) {
-            item { Spacer(Modifier.height(48.dp)) }
+            item {
+                Spacer(
+                    Modifier
+                        .statusBarsPadding()
+                        .height(12.dp)
+                )
+            }
 
             // ── Greeting ──────────────────────────────────────────────────────
             item { GreetingRow() }
@@ -114,12 +149,14 @@ fun HomeScreen(recentQuizzes: List<RecentQuiz>, navigateToDetails: (Int) -> Unit
                         description = "التقط صورة من مذكراتك",
                         icon = Icons.Outlined.DocumentScanner,
                         tint = Purple700,
+                        onClick = { cameraLauncher.launch(null) }
                     )
                     ActionCard(
                         label = "ارفع PDF",
                         description = "استيراد دفاتر او مذكرات",
                         icon = Icons.Outlined.PictureAsPdf,
                         tint = Purple500,
+                        onClick = { pdfLauncher.launch("application/pdf") }
                     )
 
                 }
@@ -162,7 +199,11 @@ fun HomeScreen(recentQuizzes: List<RecentQuiz>, navigateToDetails: (Int) -> Unit
 fun HomeScreenPreview() {
     MaterialTheme {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            HomeScreen(recentQuizzes = listOf()) {}
+            HomeScreen(
+                recentQuizzes = listOf(),
+                navigateToDetails = {},
+                onPdfSelected = {_, _ ->},
+                onImageCaptured = {})
 
         }
     }

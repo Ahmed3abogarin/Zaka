@@ -1,9 +1,7 @@
 package com.vtol.zaka.presentation.scan
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -30,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
@@ -161,15 +160,4 @@ fun ScanContent(
             )
         }
     }
-}
-
-private fun getFileName(context: Context, uri: Uri): String {
-    var name = "ملف.pdf"
-    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (cursor.moveToFirst() && nameIndex >= 0) {
-            name = cursor.getString(nameIndex)
-        }
-    }
-    return name
 }
