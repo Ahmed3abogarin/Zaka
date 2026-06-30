@@ -49,18 +49,21 @@ fun RecentScanItem(scan: QuizSession, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Icon(
-            imageVector = Icons.Default.ChevronLeft,
-            contentDescription = null,
-            tint = TextSecond,
-            modifier = Modifier.size(20.dp),
-        )
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(iconBg),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, tint = iconTint, modifier = Modifier.size(20.dp))
+        }
 
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp),
-            horizontalAlignment = Alignment.End,
+            horizontalAlignment = Alignment.Start,
         ) {
             Text(
                 scan.sourceFileName,
@@ -72,14 +75,12 @@ fun RecentScanItem(scan: QuizSession, onClick: () -> Unit) {
             Text(scan.relativeTime, fontSize = 12.sp, color = TextSecond)
         }
 
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(iconBg),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(icon, null, tint = iconTint, modifier = Modifier.size(20.dp))
-        }
+
+        Icon(
+            imageVector = Icons.Default.ChevronLeft,
+            contentDescription = null,
+            tint = TextSecond,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }
