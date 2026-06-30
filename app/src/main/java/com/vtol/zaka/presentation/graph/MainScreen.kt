@@ -31,6 +31,7 @@ import com.vtol.zaka.presentation.quiz.QuizScreen
 import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.result.ResultScreen
 import com.vtol.zaka.presentation.scan.ScanScreen
+import com.vtol.zaka.presentation.viewer.FileViewerScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -97,7 +98,15 @@ fun MainScreen() {
                         navController.getBackStackEntry<QuizGraphRoute>()
                     }
                     val viewModel: QuizViewModel = hiltViewModel(parentEntry)
-                    ScanScreen(viewModel = viewModel) { navController.navigate(QuizRoute) }
+                    ScanScreen(
+                        viewModel = viewModel,
+                        navigateToViewer = { sessionId ->
+                            navController.navigate(FileViewerRoute(sessionId))
+                        },
+                        navigateToQuiz = {
+                            navController.navigate(QuizRoute)
+                        }
+                    )
                 }
 
                 composable<QuizRoute> { backStackEntry ->
@@ -157,10 +166,20 @@ fun MainScreen() {
                         }
                     )
                 }
+
+                composable<FileViewerRoute> {
+                    FileViewerScreen {
+                        navController.popBackStack()
+                    }
+                }
             }
         }
     }
 }
+
+
+@Serializable
+data class FileViewerRoute(val sessionId: Int)
 
 
 @Serializable

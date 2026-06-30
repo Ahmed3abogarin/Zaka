@@ -11,5 +11,8 @@ data class QuizSessionEntity(
     val totalQuestions: Int,
     val correctCount: Int,
     val elapsedSeconds: Int,
+    val scanType: String,
+    val sourceFileName: String,   // display name: "ملخص الكيمياء.pdf"
+    val storedFilePath: String,   // ← actual saved file: "1719999999_ملخص الكيمياء.pdf"
     val takenAt: Long = System.currentTimeMillis(),
 )

@@ -3,7 +3,11 @@ package com.vtol.zaka.presentation.quiz
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vtol.zaka.data.local.FileStorageManager
+import com.vtol.zaka.domain.models.QuizSession
+import com.vtol.zaka.domain.models.ScanType
 import com.vtol.zaka.domain.models.quiz.Question
+import com.vtol.zaka.domain.usecases.GetRecentSessions
 import com.vtol.zaka.domain.usecases.RetakeQuizUseCase
 import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
@@ -13,21 +17,30 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.emptyList
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val generateFromPdfUseCase: GenerateFromPdfUseCase,
     private val saveQuizSessionUseCase: SaveQuizSessionUseCase,
-    private val retakeQuizUseCase: RetakeQuizUseCase
+    private val retakeQuizUseCase: RetakeQuizUseCase,
+    private val fileStorageManager: FileStorageManager,
+    getRecentSessions: GetRecentSessions
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QuizUiState())
     val state = _state.asStateFlow()
+
+    val recentScans: StateFlow<List<QuizSession>> = getRecentSessions()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _uiEffect = Channel<QuizUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
@@ -45,7 +58,17 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    fun generateFromPdf(pdf: ByteArray) {
+    fun generateFromPdf(pdf: ByteArray, fileName: String) {
+        val storedPath = fileStorageManager.savePdf(pdf, fileName)
+        _state.update {
+            it.copy(
+                scanType = ScanType.PDF,
+                sourceFileName = fileName,
+                storedFilePath = storedPath,
+                screenState = QuizScreenState.Loading,
+            )
+        }
+
         viewModelScope.launch {
             Log.d("QuizQuestions", "Loading")
 
@@ -199,7 +222,10 @@ data class QuizUiState(
     val correctCount: Int = 0,
     val selectedIndex: Int? = null,
     val isRevealed: Boolean = false,
-    val elapsedSeconds: Int = 0
+    val elapsedSeconds: Int = 0,
+    val scanType: ScanType = ScanType.PDF,
+    val sourceFileName: String = "",
+    val storedFilePath: String = ""
 ) {
     val answered get() = selectedIndex != null
     val currentQuestion get() = questions.getOrNull(currentQuestionIndex)

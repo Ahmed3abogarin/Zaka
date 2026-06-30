@@ -1,9 +1,11 @@
 package com.vtol.zaka.data.repository
 
+import com.vtol.zaka.data.local.FileStorageManager
 import com.vtol.zaka.data.local.dao.QuizSessionDao
 import com.vtol.zaka.data.local.entity.QuestionResultEntity
 import com.vtol.zaka.data.local.entity.QuizSessionEntity
 import com.vtol.zaka.domain.models.QuizSession
+import com.vtol.zaka.domain.models.ScanType
 import com.vtol.zaka.domain.models.quiz.Difficulty
 import com.vtol.zaka.domain.models.quiz.Question
 import com.vtol.zaka.domain.repository.QuizHistoryRepository
@@ -16,6 +18,7 @@ import javax.inject.Inject
 
 class QuizHistoryRepositoryImpl @Inject constructor(
     private val dao: QuizSessionDao,
+    private val fileStorageManager: FileStorageManager
 ) : QuizHistoryRepository {
 
     override suspend fun saveSession(state: QuizUiState) {
@@ -24,6 +27,9 @@ class QuizHistoryRepositoryImpl @Inject constructor(
             totalQuestions = state.questions.size,
             correctCount = state.correctCount,
             elapsedSeconds = state.elapsedSeconds,
+            scanType = state.scanType.name,
+            sourceFileName = state.sourceFileName,
+            storedFilePath = state.storedFilePath
         )
         val results = state.questionResults.map {
             QuestionResultEntity(
@@ -64,7 +70,11 @@ class QuizHistoryRepositoryImpl @Inject constructor(
         return sessionWithResults.session.toDomain().copy(results = domainResults)
     }
 
-    override suspend fun deleteSession(sessionId: Int) = dao.deleteSession(sessionId)
+    override suspend fun deleteSession(sessionId: Int) {
+        val session = dao.getSessionWithResults(sessionId)
+        session?.let { fileStorageManager.deleteFile(it.session.storedFilePath) }
+        dao.deleteSession(sessionId)
+    }
 
     override suspend fun getSessionWithResults(sessionId: Int): Result<List<Question>> {
         return dao.getSessionWithResults(sessionId)
@@ -85,6 +95,9 @@ class QuizHistoryRepositoryImpl @Inject constructor(
                 )
             } ?: Result.failure(Exception("Session not found"))
     }
+
+    override fun getRecentSession(limit: Int): Flow<List<QuizSession>> =
+        dao.getRecentSessions().map { entities -> entities.map { it.toDomain() } }
 }
 
 private fun QuizSessionEntity.toDomain() = QuizSession(
@@ -94,4 +107,7 @@ private fun QuizSessionEntity.toDomain() = QuizSession(
     correctCount = correctCount,
     elapsedSeconds = elapsedSeconds,
     takenAt = takenAt,
+    scanType = ScanType.valueOf(scanType),
+    sourceFileName = sourceFileName,
+    sourceFilePath = storedFilePath
 )

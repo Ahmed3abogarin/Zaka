@@ -18,6 +18,7 @@ ksp = "2.3.9"
 roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
+coilCompose = "2.7.0"
 
 
 [libraries]
@@ -45,6 +46,8 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 firebase-ai = { group = "com.google.firebase", name = "firebase-ai", version.ref = "firebaseAi" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+
 
 [plugins]
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidVersion" }

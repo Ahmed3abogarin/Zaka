@@ -12,4 +12,6 @@ interface QuizHistoryRepository {
     suspend fun deleteSession(sessionId: Int)
 
     suspend fun getSessionWithResults(sessionId: Int): Result<List<Question>>
+
+    fun getRecentSession(limit: Int = 3): Flow<List<QuizSession>>
 }

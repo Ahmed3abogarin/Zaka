@@ -3,6 +3,7 @@ package com.vtol.zaka.di
 import android.content.Context
 import androidx.room.Room
 import com.vtol.zaka.data.local.AppDatabase
+import com.vtol.zaka.data.local.FileStorageManager
 import com.vtol.zaka.data.local.dao.QuizSessionDao
 import com.vtol.zaka.data.repository.QuizHistoryRepositoryImpl
 import com.vtol.zaka.domain.repository.QuizHistoryRepository
@@ -20,13 +21,14 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "zaka_db").build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "zaka_db")
+            .fallbackToDestructiveMigration(false).build()
 
     @Provides
     fun provideQuizSessionDao(db: AppDatabase): QuizSessionDao = db.quizSessionDao()
 
     @Provides
     @Singleton
-    fun provideQuizHistoryRepository(dao: QuizSessionDao): QuizHistoryRepository =
-        QuizHistoryRepositoryImpl(dao)
+    fun provideQuizHistoryRepository(dao: QuizSessionDao, fileStorageManager: FileStorageManager): QuizHistoryRepository =
+        QuizHistoryRepositoryImpl(dao,fileStorageManager)
 }

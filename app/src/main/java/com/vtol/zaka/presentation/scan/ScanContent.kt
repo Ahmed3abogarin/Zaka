@@ -1,6 +1,8 @@
 package com.vtol.zaka.presentation.scan
 
+import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -19,31 +21,28 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vtol.zaka.domain.models.ScanHistoryItem
+import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
-import com.vtol.zaka.presentation.scan.components.ScanHistorySection
+import com.vtol.zaka.presentation.scan.components.RecentScansSection
 import com.vtol.zaka.presentation.scan.components.SecondaryActionCard
-import com.vtol.zaka.ui.theme.Purple100
-import com.vtol.zaka.ui.theme.Purple500
-import com.vtol.zaka.ui.theme.Teal100
-import com.vtol.zaka.ui.theme.Teal400
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
-fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> Unit) {
+fun ScanContent(
+    recentSessions: List<QuizSession>,
+    navigateToViewer: (Int) -> Unit,
+    generateFromPdf: (ByteArray, String) -> Unit
+) {
     val context = LocalContext.current
 
     // PDF picker
@@ -51,13 +50,9 @@ fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> U
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val bytes = context.contentResolver
-                .openInputStream(it)
-                ?.readBytes()
-
-            if (bytes != null) {
-                generateFromPdf(bytes)
-            }
+            val bytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: return@let
+            val fileName = getFileName(context, uri)
+            generateFromPdf(bytes, fileName)
         }
     }
 
@@ -78,25 +73,6 @@ fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> U
 
         }
     }
-
-
-    val history = listOf(
-        ScanHistoryItem(
-            title = "ملخص الكيمياء.pdf",
-            subtitle = "منذ ساعتين",
-            icon = Icons.Outlined.PictureAsPdf,
-            iconBg = Teal100,
-            iconTint = Teal400,
-        ),
-        ScanHistoryItem(
-            title = "صفحة ٤٢ - فيزياء",
-            subtitle = "يوم أمس",
-            icon = Icons.Outlined.Image,
-            iconBg = Purple100,
-            iconTint = Purple500,
-        )
-    )
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -179,10 +155,22 @@ fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> U
 
         // ── Scan history ──────────────────────────────────────────────────
         item {
-            ScanHistorySection(
-                items = history,
+            RecentScansSection(
                 modifier = Modifier.padding(horizontal = 20.dp),
+                scans = recentSessions,
+                onClick = navigateToViewer
             )
         }
     }
+}
+
+private fun getFileName(context: Context, uri: Uri): String {
+    var name = "ملف.pdf"
+    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (cursor.moveToFirst() && nameIndex >= 0) {
+            name = cursor.getString(nameIndex)
+        }
+    }
+    return name
 }

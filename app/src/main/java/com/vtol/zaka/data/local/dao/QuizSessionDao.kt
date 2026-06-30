@@ -39,4 +39,7 @@ interface QuizSessionDao {
     @Transaction
     @Query("SELECT * FROM quiz_sessions WHERE id = :sessionId")
     suspend fun getSessionWithResults(sessionId: Int): SessionWithResults?
+
+    @Query("SELECT * FROM quiz_sessions ORDER BY takenAt DESC LIMIT :limit")
+    fun getRecentSessions(limit: Int = 3): Flow<List<QuizSessionEntity>>
 }
