@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
-    private val getProgressStatsUseCase: GetProgressStatsUseCase
+    getProgressStatsUseCase: GetProgressStatsUseCase
 ) : ViewModel() {
 
     val stats: StateFlow<ProgressStats?> = getProgressStatsUseCase()

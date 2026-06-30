@@ -19,11 +19,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.presentation.progress.WeeklyActivity
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.util.Calendar
 
 @Composable
 fun WeeklyActivityCard(activity: List<WeeklyActivity>) {
     val maxCount = activity.maxOf { it.count }.coerceAtLeast(1)
-    val today    = 3   // 0-based index of today (أربع = index 3 in the sample)
+    val todayName = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+        Calendar.SATURDAY -> "سبت"
+        Calendar.SUNDAY -> "أحد"
+        Calendar.MONDAY -> "اثن"
+        Calendar.TUESDAY -> "ثلاث"
+        Calendar.WEDNESDAY -> "أربع"
+        Calendar.THURSDAY -> "خمس"
+        Calendar.FRIDAY -> "جمعة"
+        else -> ""
+    }
 
     Column(
         modifier = Modifier
@@ -34,26 +46,26 @@ fun WeeklyActivityCard(activity: List<WeeklyActivity>) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text       = "نشاطك الأسبوعي",
-            fontSize   = 18.sp,
+            text = "نشاطك الأسبوعي",
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color      = Color(0xFF111827),
-            modifier   = Modifier.fillMaxWidth(),
-            textAlign  = TextAlign.End,
+            color = Color(0xFF111827),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.End,
         )
 
         Row(
-            modifier              = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(140.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment     = Alignment.Bottom,
+            verticalAlignment = Alignment.Bottom,
         ) {
-            activity.forEachIndexed { index, item ->
+            activity.forEach { item ->
                 ActivityBar(
-                    day       = item.day,
-                    fraction  = item.count.toFloat() / maxCount,
-                    isToday   = index == today,
+                    day = item.day,
+                    fraction = item.count.toFloat() / maxCount,
+                    isToday = item.day == todayName,
                 )
             }
         }

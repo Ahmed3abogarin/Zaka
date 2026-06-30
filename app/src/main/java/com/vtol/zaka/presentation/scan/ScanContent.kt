@@ -46,7 +46,7 @@ import com.vtol.zaka.ui.theme.TextSecond
 fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> Unit) {
     val context = LocalContext.current
 
-   // PDF picker
+    // PDF picker
     val pdfLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -80,111 +80,109 @@ fun ScanContent(modifier: Modifier = Modifier, generateFromPdf: (ByteArray) -> U
     }
 
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        val history = listOf(
-            ScanHistoryItem(
-                title = "ملخص الكيمياء.pdf",
-                subtitle = "منذ ساعتين",
-                icon = Icons.Outlined.PictureAsPdf,
-                iconBg = Teal100,
-                iconTint = Teal400,
-            ),
-            ScanHistoryItem(
-                title = "صفحة ٤٢ - فيزياء",
-                subtitle = "يوم أمس",
-                icon = Icons.Outlined.Image,
-                iconBg = Purple100,
-                iconTint = Purple500,
-            )
+    val history = listOf(
+        ScanHistoryItem(
+            title = "ملخص الكيمياء.pdf",
+            subtitle = "منذ ساعتين",
+            icon = Icons.Outlined.PictureAsPdf,
+            iconBg = Teal100,
+            iconTint = Teal400,
+        ),
+        ScanHistoryItem(
+            title = "صفحة ٤٢ - فيزياء",
+            subtitle = "يوم أمس",
+            icon = Icons.Outlined.Image,
+            iconBg = Purple100,
+            iconTint = Purple500,
         )
+    )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
-            contentPadding = PaddingValues(bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentPadding = PaddingValues(bottom = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
 
-            // ── Top spacing ───────────────────────────────────────────────────
-            item { Spacer(Modifier.height(56.dp)) }
+        // ── Top spacing ───────────────────────────────────────────────────
+        item { Spacer(Modifier.height(56.dp)) }
 
-            // ── Header text ───────────────────────────────────────────────────
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = "امسح ملاحظاتك",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "حوّل أوراقك الدراسية إلى ملخصات ذكية في ثوان",
-                        fontSize = 14.sp,
-                        color = TextSecond,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 22.sp,
-                    )
-                }
-            }
-
-            item { Spacer(Modifier.height(40.dp)) }
-
-            // ── Camera button ─────────────────────────────────────────────────
-            item { CameraButton { cameraLauncher.launch(null) } }
-
-            item { Spacer(Modifier.height(40.dp)) }
-
-            // ── Secondary action cards ─────────────────────────────────────────
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    SecondaryActionCard(
-                        label = "من المعرض",
-                        icon = Icons.Outlined.Image,
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            galleryLauncher.launch("image/*")
-                        }
-                    )
-                    SecondaryActionCard(
-                        label = "ملف PDF",
-                        icon = Icons.Outlined.PictureAsPdf,
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            pdfLauncher.launch("application/pdf")
-                        }
-                    )
-                }
-            }
-
-            item { Spacer(Modifier.height(24.dp)) }
-
-            // ── AI tip card ───────────────────────────────────────────────────
-            item {
-                AiTipCard(modifier = Modifier.padding(horizontal = 20.dp))
-            }
-
-            item { Spacer(Modifier.height(24.dp)) }
-
-            // ── Scan history ──────────────────────────────────────────────────
-            item {
-                ScanHistorySection(
-                    items = history,
-                    modifier = Modifier.padding(horizontal = 20.dp),
+        // ── Header text ───────────────────────────────────────────────────
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "امسح ملاحظاتك",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "حوّل أوراقك الدراسية إلى ملخصات ذكية في ثوان",
+                    fontSize = 14.sp,
+                    color = TextSecond,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp,
                 )
             }
+        }
+
+        item { Spacer(Modifier.height(40.dp)) }
+
+        // ── Camera button ─────────────────────────────────────────────────
+        item { CameraButton { cameraLauncher.launch(null) } }
+
+        item { Spacer(Modifier.height(40.dp)) }
+
+        // ── Secondary action cards ─────────────────────────────────────────
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                SecondaryActionCard(
+                    label = "من المعرض",
+                    icon = Icons.Outlined.Image,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        galleryLauncher.launch("image/*")
+                    }
+                )
+                SecondaryActionCard(
+                    label = "ملف PDF",
+                    icon = Icons.Outlined.PictureAsPdf,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        pdfLauncher.launch("application/pdf")
+                    }
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+
+        // ── AI tip card ───────────────────────────────────────────────────
+        item {
+            AiTipCard(modifier = Modifier.padding(horizontal = 20.dp))
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+
+        // ── Scan history ──────────────────────────────────────────────────
+        item {
+            ScanHistorySection(
+                items = history,
+                modifier = Modifier.padding(horizontal = 20.dp),
+            )
         }
     }
 }

@@ -20,16 +20,9 @@ import com.vtol.zaka.ui.theme.LabelActive
 import com.vtol.zaka.ui.theme.LabelIdle
 import com.vtol.zaka.ui.theme.NavBg
 
-/**
- * Arabic bottom navigation bar with three tabs:
- *   الرئيسية (Home)  |  مسح (Scan — elevated FAB)  |  تقدمي (Progress)
- *
- * RTL note: wrap this inside `CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl)`
- * at your theme/screen level so Arabic ordering is applied automatically.
- */
 @Composable
 fun ArabicBottomNavBar(
-    selectedIndex: Int = 0,           // 0 = Home, 1 = Scan, 2 = Progress
+    selectedIndex: Int = 0,
     onItemSelected: (Int) -> Unit = {},
 ) {
     Box(
@@ -54,28 +47,28 @@ fun ArabicBottomNavBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(72.dp),
+                    .height(78.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                // Right side in Arabic RTL → الرئيسية (Home)
-                NavIconItem(
-                    icon = Icons.Outlined.Home,
-                    label = "الرئيسية",
-                    selected = selectedIndex == 0,
-                    onClick = { onItemSelected(0) },
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Center placeholder — ScanFab floats above
-                Spacer(Modifier.weight(1f))
-
                 // Left side in Arabic RTL → تقدمي (Progress)
                 NavIconItem(
                     icon = Icons.Outlined.BarChart,
                     label = "تقدمي",
                     selected = selectedIndex == 2,
                     onClick = { onItemSelected(2) },
+                    modifier = Modifier.weight(1f)
+                )
+
+                // Center placeholder — ScanFab floats above
+                Spacer(Modifier.weight(1f))
+
+                // Right side in Arabic RTL → الرئيسية (Home)
+                NavIconItem(
+                    icon = Icons.Outlined.Home,
+                    label = "الرئيسية",
+                    selected = selectedIndex == 0,
+                    onClick = { onItemSelected(0) },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -96,7 +89,7 @@ fun ArabicBottomNavBar(
             color = if (selectedIndex == 1) LabelActive else LabelIdle,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 8.dp)
+                .padding(bottom = 14.dp)
         )
     }
 }

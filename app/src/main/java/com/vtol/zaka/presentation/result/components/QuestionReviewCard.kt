@@ -22,13 +22,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.domain.models.quiz.Difficulty
@@ -77,6 +81,20 @@ fun QuestionReviewCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    // Question badge
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color(0xFFF3F4F6))
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = "سؤال $index",
+                            fontSize = 12.sp,
+                            color = TextSecond,
+                        )
+                    }
+
                     // Correct / wrong circle
                     Box(
                         modifier = Modifier
@@ -92,20 +110,6 @@ fun QuestionReviewCard(
                             modifier = Modifier.size(15.dp),
                         )
                     }
-
-                    // Question badge
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Color(0xFFF3F4F6))
-                            .padding(horizontal = 12.dp, vertical = 4.dp),
-                    ) {
-                        Text(
-                            text = "سؤال $index",
-                            fontSize = 12.sp,
-                            color = TextSecond,
-                        )
-                    }
                 }
 
                 // Question text
@@ -114,7 +118,7 @@ fun QuestionReviewCard(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary,
-                    textAlign = TextAlign.End,
+                    textAlign = TextAlign.Start,
                     lineHeight = 24.sp,
                 )
 
@@ -122,20 +126,21 @@ fun QuestionReviewCard(
 
                 // User's answer
                 Row(
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "إجابتك:",
+                            fontSize = 13.sp,
+                            color = TextSecond,
+                        )
                         Text(
                             text = result.question.options[result.selectedIndex],
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = accentColor,
-                        )
-                        Text(
-                            text = ":إجابتك",
-                            fontSize = 13.sp,
-                            color = TextSecond,
+                            textDecoration = if (!result.isCorrect) TextDecoration.LineThrough else TextDecoration.None
                         )
                     }
                 }
@@ -143,20 +148,20 @@ fun QuestionReviewCard(
                 // Show correct answer only if wrong
                 if (!result.isCorrect) {
                     Row(
-                        horizontalArrangement = Arrangement.End,
+                        horizontalArrangement = Arrangement.Start,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = "الإجابة الصحيحة:",
+                                fontSize = 13.sp,
+                                color = TextSecond,
+                            )
                             Text(
                                 text = result.question.options[result.question.correctIndex],
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Green500,
-                            )
-                            Text(
-                                text = ":الإجابة الصحيحة",
-                                fontSize = 13.sp,
-                                color = TextSecond,
                             )
                         }
                     }
@@ -171,19 +176,23 @@ fun QuestionReviewCard(
 @Composable
 fun ReviewCardPreview(){
     ZakaTheme {
-        QuestionReviewCard(
-            index = 0,
-            QuestionResult(
-                selectedIndex = 0,
-                question = Question("Ggs",
-                    "gsdg",
-                    listOf(""),
-                    0,
-                    "","" ,
-                    Difficulty.MEDIUM
-                ),
-                isCorrect = false
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            QuestionReviewCard(
+                index = 2,
+                QuestionResult(
+                    selectedIndex = 0,
+                    question = Question(
+                        "Ggs",
+                        "ما هو الاسم الاول لترمب؟",
+                        listOf("موز", "تفاح"),
+                        0,
+                        "",
+                        "",
+                        Difficulty.MEDIUM
+                    ),
+                    isCorrect = false
+                )
             )
-        )
+        }
     }
 }

@@ -151,6 +151,9 @@ fun MainScreen() {
                         onNavigateToQuiz = { id ->
                             quizViewModel.retakeFromHistory(id)
                             navController.navigate(QuizRoute)
+                        },
+                        onBack = {
+                            navController.popBackStack()
                         }
                     )
                 }

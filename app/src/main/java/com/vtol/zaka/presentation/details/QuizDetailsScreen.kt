@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -74,9 +75,17 @@ fun QuizDetailScreen(
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                null,
+                                tint = TextPrimary
+                            )
+                        }
+
                         Column(horizontalAlignment = Alignment.End) {
                             Text(
                                 session.topic,
@@ -85,14 +94,6 @@ fun QuizDetailScreen(
                                 color = TextPrimary
                             )
                             Text(session.formattedDate, fontSize = 13.sp, color = TextSecond)
-                        }
-
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowForward,
-                                null,
-                                tint = TextPrimary
-                            )
                         }
                     }
                 }

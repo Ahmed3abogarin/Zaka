@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
 fun ActivityBar(
@@ -35,7 +36,7 @@ fun ActivityBar(
         label = "barHeight",
     )
 
-    val barColor = if (isToday) Color(0xFF4338CA) else Color(0xFFDDD9F5)
+    val barColor = if (isToday) Purple700 else Color(0xFFDDD9F5)
     val maxBarHeight = 100.dp
 
     Column(

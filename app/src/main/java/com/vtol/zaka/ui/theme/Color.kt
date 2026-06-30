@@ -33,7 +33,7 @@ val GreenLight = Color(0xFFF0FDF4)
 val BorderDefault = Color(0xFFE5E7EB)
 val TimerBg = Color(0xFFFFF9C4)
 val TimerText = Color(0xFFF59E0B)
-val NavBg = Color(0xFFF2F0FA)
+val NavBg = Color(0xFFF8F7FC)
 
 val Purple200 = Color(0xFFD9CFFF)   // light lavender glow ring
 val LabelActive = Color(0xFF4A23C6)   // label under active item
