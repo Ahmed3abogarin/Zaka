@@ -3,6 +3,7 @@ package com.vtol.zaka.presentation.home.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,14 +31,16 @@ import com.vtol.zaka.R
 import com.vtol.zaka.ui.theme.Teal400
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.ZakaTheme
+import com.vtol.zaka.util.showToast
 
 @Composable
 fun CategoryCard(
     modifier: Modifier = Modifier,
     label: String,
     color: Color,
-    @DrawableRes icon: Int,
+    @DrawableRes icon: Int
 ) {
+    val context = LocalContext.current
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
@@ -46,7 +50,8 @@ fun CategoryCard(
                 shape = RoundedCornerShape(16.dp)
             )
             .background(Color.White)
-            .size(150.dp),
+            .size(150.dp)
+            .clickable { context.showToast() },
         contentAlignment = Alignment.Center
     ) {
         Box(modifier = Modifier.fillMaxSize().background(color.copy(alpha = 0.05f)))

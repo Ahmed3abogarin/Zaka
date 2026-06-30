@@ -79,14 +79,14 @@ fun ActionCard(
             ) {
                 Text(
                     text = label,
-                    fontSize = 25.sp,
+                    fontSize = 23.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary,
                 )
 
                 Text(
                     text = description,
-                    fontSize = 17.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     color = TextSecond,
                 )

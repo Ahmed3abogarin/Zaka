@@ -1,5 +1,7 @@
 package com.vtol.zaka.util
 
+import android.content.Context
+import android.widget.Toast
 import java.util.Locale
 
 // ── Helper: format number with Arabic-style comma ─────────────────────────────
@@ -17,4 +19,8 @@ fun Long.toRelativeTimeArabic(): String {
         days  == 1L -> "يوم أمس"
         else       -> "منذ $days أيام"
     }
+}
+
+fun Context.showToast(text: String = "Not available yet") {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
