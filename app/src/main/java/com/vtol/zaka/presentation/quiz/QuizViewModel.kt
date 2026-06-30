@@ -1,5 +1,11 @@
 package com.vtol.zaka.presentation.quiz
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,12 +13,15 @@ import com.vtol.zaka.data.local.FileStorageManager
 import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.domain.models.ScanType
 import com.vtol.zaka.domain.models.quiz.Question
+import com.vtol.zaka.domain.usecases.GenerateFromImage
 import com.vtol.zaka.domain.usecases.GetRecentSessions
 import com.vtol.zaka.domain.usecases.RetakeQuizUseCase
 import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
+import com.vtol.zaka.domain.usecases.quiz.ValidateImageUseCase
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -24,12 +33,15 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.emptyList
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val generateFromPdfUseCase: GenerateFromPdfUseCase,
+    private val generateFromImageUseCase: GenerateFromImage,
+    private val validateImageUseCase: ValidateImageUseCase,
     private val saveQuizSessionUseCase: SaveQuizSessionUseCase,
     private val retakeQuizUseCase: RetakeQuizUseCase,
     private val fileStorageManager: FileStorageManager,
@@ -96,6 +108,41 @@ class QuizViewModel @Inject constructor(
                             )
                         }
                     }
+                )
+        }
+    }
+
+    fun generateFromImageUri(uri: Uri, context: Context) {
+        viewModelScope.launch {
+            val bitmap = withContext(Dispatchers.IO) { uriToBitmap(context, uri) }
+            generateFromImage(bitmap)
+        }
+    }
+
+    fun generateFromImage(bitmap: Bitmap) {
+        val error = validateImageUseCase(bitmap)
+        if (error != null) {
+            _state.update { it.copy(screenState = QuizScreenState.Error(error.messageAr)) }
+            return
+        }
+
+        val storedPath = fileStorageManager.saveImage(bitmap)
+        _state.update {
+            it.copy(
+                scanType       = ScanType.IMAGE,
+                sourceFileName = "صورة ممسوحة",
+                storedFilePath = storedPath,
+                screenState    = QuizScreenState.Loading,
+            )
+        }
+        viewModelScope.launch {
+            _state.update {
+                it.copy(screenState = QuizScreenState.Loading)
+            }
+            generateFromImageUseCase(bitmap)
+                .fold(
+                    onSuccess = { questions -> _state.update { it.copy(questions = questions) } },
+                    onFailure = { e -> _state.update { it.copy(screenState = QuizScreenState.Error(e.message ?: "حدث خطأ غير متوقع")) } }
                 )
         }
     }
@@ -198,6 +245,16 @@ class QuizViewModel @Inject constructor(
                         }
                     }
                 )
+        }
+    }
+
+    private fun uriToBitmap(context: Context, uri: Uri): Bitmap {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            @Suppress("DEPRECATION")
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         }
     }
 

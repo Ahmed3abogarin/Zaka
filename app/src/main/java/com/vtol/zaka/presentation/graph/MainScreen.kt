@@ -1,5 +1,9 @@
 package com.vtol.zaka.presentation.graph
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
@@ -54,9 +58,13 @@ fun MainScreen() {
             val showBottomNav = currentDestination?.hasRoute<HomeRoute>() == true ||
                     currentDestination?.hasRoute<ScanRoute>() == true || currentDestination?.hasRoute<ProgressRoute>() == true
 
-            if (showBottomNav) {
+            AnimatedVisibility(
+                visible = showBottomNav,
+                enter = slideInVertically(animationSpec = tween(200)) { it },
+                exit = slideOutVertically(animationSpec = tween(200)) { it },
+            ) {
                 val selectedIndex = tabs.indexOfFirst { tab ->
-                    currentDestination.hierarchy.any { it.hasRoute(tab.route::class) }
+                    currentDestination?.hierarchy?.any { it.hasRoute(tab.route::class) } == true
                 }.coerceAtLeast(0)
 
                 ArabicBottomNavBar(
@@ -71,7 +79,6 @@ fun MainScreen() {
                         }
                     }
                 )
-
             }
         }
     ) { innerPadding ->

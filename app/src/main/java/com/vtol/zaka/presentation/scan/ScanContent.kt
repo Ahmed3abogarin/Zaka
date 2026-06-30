@@ -1,6 +1,7 @@
 package com.vtol.zaka.presentation.scan
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,7 +42,9 @@ import com.vtol.zaka.ui.theme.TextSecond
 fun ScanContent(
     recentSessions: List<QuizSession>,
     navigateToViewer: (Int) -> Unit,
-    generateFromPdf: (ByteArray, String) -> Unit
+    generateFromPdf: (ByteArray, String) -> Unit,
+    generateFromGallery: (Uri) -> Unit,
+    generateFromCamera: (Bitmap) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -60,18 +63,14 @@ fun ScanContent(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
-        bitmap?.let {
-
-        }
+        bitmap?.let { generateFromCamera(it) }
     }
 
     // gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-
-        }
+        uri?.let { generateFromGallery(it) }
     }
     LazyColumn(
         modifier = Modifier

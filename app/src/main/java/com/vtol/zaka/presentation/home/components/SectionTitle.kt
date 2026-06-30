@@ -12,7 +12,7 @@ import com.vtol.zaka.ui.theme.TextPrimary
 fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        fontSize = 20.sp,
+        fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         color = TextPrimary,
         modifier = modifier.fillMaxWidth(),
