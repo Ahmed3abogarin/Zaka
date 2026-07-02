@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vtol.zaka.ads.InterstitialAdManager
 import com.vtol.zaka.data.local.FileStorageManager
 import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.domain.models.ScanType
@@ -45,6 +46,7 @@ class QuizViewModel @Inject constructor(
     private val saveQuizSessionUseCase: SaveQuizSessionUseCase,
     private val retakeQuizUseCase: RetakeQuizUseCase,
     private val fileStorageManager: FileStorageManager,
+    val interstitialAdManager: InterstitialAdManager,
     getRecentSessions: GetRecentSessions
 ) : ViewModel() {
 
@@ -58,6 +60,10 @@ class QuizViewModel @Inject constructor(
     val uiEffect = _uiEffect.receiveAsFlow()
 
     private var timerJob: Job? = null
+
+    init {
+        interstitialAdManager.loadAd()
+    }
 
 
     fun onEvent(event: QuizEvent) {

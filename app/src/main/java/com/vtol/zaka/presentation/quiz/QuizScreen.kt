@@ -18,6 +18,7 @@ fun QuizScreen(
 
     val state by viewModel.state.collectAsState()
 
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect {
             when (it) {
@@ -28,7 +29,10 @@ fun QuizScreen(
 
     when (state.screenState) {
         is QuizScreenState.Loading -> {
-            QuizLoadingContent(state = state, onReadyToNavigate = {
+            QuizLoadingContent(
+                interstitialAdManager = viewModel.interstitialAdManager,
+                state = state,
+                onReadyToNavigate = {
                 viewModel.onQuizReady()
             })
         }

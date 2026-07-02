@@ -1,5 +1,6 @@
 package com.vtol.zaka.presentation.quiz
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -17,12 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.ads.InterstitialAdManager
 import com.vtol.zaka.presentation.quiz.model.LoadingSource
 import com.vtol.zaka.presentation.quiz.model.getFunFacts
 import com.vtol.zaka.presentation.quiz.model.imageSteps
@@ -43,12 +44,11 @@ import kotlinx.coroutines.delay
 fun QuizLoadingContent(
     source: LoadingSource = LoadingSource.PDF,
     topic: String = "",
+    interstitialAdManager: InterstitialAdManager,
     state: QuizUiState,
-    onReadyToNavigate: () -> Unit
+    onReadyToNavigate: () -> Unit,
 ) {
-    // TODO: Integrate the interstitial ad and the navigation logic
 
-    val context = LocalContext.current
     val steps = remember(source) {
         when (source) {
             LoadingSource.PDF -> pdfSteps
@@ -62,8 +62,9 @@ fun QuizLoadingContent(
     var currentStep by remember { mutableIntStateOf(0) }
     var currentFact by remember { mutableIntStateOf(0) }
     var adShown by remember { mutableStateOf(false) }
+    var adAboutToShow by remember { mutableStateOf(false) }
 
-    // ─── Animate steps independently from AI ──────────────────────────────
+    // ─── Animate steps independently of AI ─────────────────────────────
     LaunchedEffect(Unit) {
         steps.forEachIndexed { index, step ->
             if (index > currentStep) currentStep = index
@@ -78,20 +79,28 @@ fun QuizLoadingContent(
             currentFact = (currentFact + 1) % funFacts.size
         }
     }
+    val activity = LocalActivity.current
 
-    // ─── THE KEY LOGIC ────────────────────────────────────────────────────
-    // Safely observe when the questions slice populates without duplicate execution loops
+    // ─── Key logic: wait for questions, show notice, then navigate ────────
     LaunchedEffect(state.questions) {
         if (state.questions.isNotEmpty() && !adShown) {
             adShown = true
-            currentStep = steps.lastIndex // Force UI checkpoints to complete checkmark animations
+            currentStep = steps.lastIndex   // complete all checkmarks
 
-            // Ad implementation logic wrapper fits directly here later
-            delay(600) // Small programmatic padding so the final layout checkmark step is visible
+            delay(600)                      // let final checkmark animate
+
+            adAboutToShow = true            // show ad notice
+            delay(1500)                     // user reads notice for 1.5s
+
+            activity?.let {
+                interstitialAdManager.showAdAndWait(activity)
+
+            }
             onReadyToNavigate()
         }
     }
 
+    // ─── Background blob animations ───────────────────────────────────────
     val infiniteTransition = rememberInfiniteTransition(label = "bg_blobs")
 
     val blob1Y by infiniteTransition.animateFloat(
@@ -99,39 +108,38 @@ fun QuizLoadingContent(
         targetValue = -20f,
         animationSpec = infiniteRepeatable(
             animation = tween(4000, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "blob1_y"
+        label = "blob1_y",
     )
-
     val blob2Y by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 20f,
         animationSpec = infiniteRepeatable(
             animation = tween(5500, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "blob2_y"
+        label = "blob2_y",
     )
-
     val blob3Y by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 20f,
         animationSpec = infiniteRepeatable(
             animation = tween(3800, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "blob3_y"
+        label = "blob3_y",
     )
 
-    // ─── UI Layout Tree ──────────────────────────────────────────────────
+    // ─── UI ───────────────────────────────────────────────────────────────
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
-        // Top-start purple blob
+
+        // ── Background blobs ──────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -147,8 +155,6 @@ fun QuizLoadingContent(
                     shape = CircleShape,
                 )
         )
-
-// Center-start blue blob
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -164,15 +170,11 @@ fun QuizLoadingContent(
                     shape = CircleShape,
                 )
         )
-
-// Bottom-end pink blob
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(340.dp)
-                .graphicsLayer {
-                    translationX = blob3Y.dp.toPx()
-                }
+                .graphicsLayer { translationX = blob3Y.dp.toPx() }
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(Color(0xFFFEE1FC), Color.Transparent)
@@ -181,61 +183,60 @@ fun QuizLoadingContent(
                 )
         )
 
-
+        // ── Main content ──────────────────────────────────────────────────
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp)
+                .padding(24.dp),
         ) {
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(Modifier.height(28.dp))
 
-            // ─── Animated current step ────────────────────────────────────
+            // ── Animated current step ─────────────────────────────────────
             AnimatedContent(
                 targetState = steps.getOrNull(currentStep),
                 transitionSpec = {
                     slideInVertically { it } + fadeIn() togetherWith
                             slideOutVertically { -it } + fadeOut()
                 },
-                label = "step_content"
+                label = "step_content",
             ) { step ->
                 step?.let {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(90.dp)
+                            modifier = Modifier.size(90.dp),
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(90.dp),
                                 color = Color(0xFF7F77DD),
                                 trackColor = Color(0xFF2A2A4A),
-                                strokeWidth = 3.dp
+                                strokeWidth = 3.dp,
                             )
                             Text(text = it.icon, fontSize = 32.sp)
-
                         }
                         Text(
                             text = it.titleAr,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary
+                            color = TextPrimary,
                         )
                         Text(
                             text = it.descriptionAr,
                             fontSize = 12.sp,
                             color = TextSecond,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(Modifier.height(20.dp))
 
-            // ─── Step dots ────────────────────────────────────────────────
+            // ── Step dots ─────────────────────────────────────────────────
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 steps.forEachIndexed { index, _ ->
                     val isActive = index == currentStep
@@ -255,17 +256,17 @@ fun QuizLoadingContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // ─── Step checklist ───────────────────────────────────────────
+            // ── Step checklist ────────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .border(width = 0.5.dp, color = BorderDefault, RoundedCornerShape(14.dp))
+                    .border(0.5.dp, BorderDefault, RoundedCornerShape(14.dp))
                     .background(GrayBg)
                     .padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 steps.forEachIndexed { index, step ->
                     val isDone = index < currentStep
@@ -273,38 +274,33 @@ fun QuizLoadingContent(
 
                     AnimatedVisibility(
                         visible = index <= currentStep,
-                        enter = fadeIn() + expandVertically()
+                        enter = fadeIn() + expandVertically(),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(22.dp)
                                     .clip(RoundedCornerShape(50))
-                                    .background(
-                                        when {
-                                            isDone -> Purple700
-                                            else -> Color.Transparent
-                                        }
-                                    ),
-                                contentAlignment = Alignment.Center
+                                    .background(if (isDone) Purple700 else Color.Transparent),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 when {
                                     isDone -> Icon(
-                                        modifier = Modifier.padding(4.dp),
-                                        tint = Color.White,
                                         imageVector = Icons.Default.Check,
-                                        contentDescription = null
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.padding(4.dp),
                                     )
 
                                     isActive -> CircularProgressIndicator(
                                         modifier = Modifier.fillMaxSize(),
                                         color = Purple700,
                                         strokeWidth = 2.5.dp,
-                                        trackColor = Color.LightGray
+                                        trackColor = Color.LightGray,
                                     )
                                 }
                             }
@@ -321,35 +317,31 @@ fun QuizLoadingContent(
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(start = 10.dp)
+                                    .padding(start = 10.dp),
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // ─── Fun fact card ────────────────────────────────────────────
+            // ── Fun fact card ─────────────────────────────────────────────
             AnimatedContent(
                 targetState = funFacts.getOrNull(currentFact),
                 transitionSpec = {
                     fadeIn(tween(600)) togetherWith fadeOut(tween(600))
                 },
-                label = "fun_fact"
+                label = "fun_fact",
             ) { fact ->
                 fact?.let {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .border(
-                                width = 0.5.dp,
-                                color = BorderDefault,
-                                RoundedCornerShape(12.dp)
-                            )
+                            .border(0.5.dp, BorderDefault, RoundedCornerShape(12.dp))
                             .background(GrayBg)
-                            .padding(14.dp)
+                            .padding(14.dp),
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                             Text(
@@ -358,7 +350,7 @@ fun QuizLoadingContent(
                                 color = Purple700,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Right
+                                textAlign = TextAlign.Right,
                             )
                             Text(
                                 text = it,
@@ -366,32 +358,54 @@ fun QuizLoadingContent(
                                 color = TextSecond,
                                 textAlign = TextAlign.Right,
                                 modifier = Modifier.fillMaxWidth(),
-                                lineHeight = 18.sp
+                                lineHeight = 18.sp,
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(12.dp))
 
-            // ─── Status message ──────────────────
+            // ── Status message ────────────────────────────────────────────
             AnimatedContent(
                 targetState = state.questions.isNotEmpty(),
-                label = "status_message"
+                label = "status_message",
             ) { isReady ->
                 Text(
-                    text = if (isReady)
-                        "اختبارك جاهز! سيبدأ بعد لحظة ⚡"
-                    else
-                        "جاري تحضير اختبارك...",
+                    text = if (isReady) "اختبارك جاهز! سيبدأ بعد لحظة ⚡"
+                    else "جاري تحضير اختبارك...",
                     fontSize = 11.sp,
-                    color = if (isReady)
-                        Color(0xFF5DCAA5)
-                    else
-                        Color.White.copy(alpha = 0.3f),
-                    fontWeight = if (isReady) FontWeight.Medium else FontWeight.Normal
+                    color = if (isReady) Color(0xFF5DCAA5)
+                    else Color.White.copy(alpha = 0.3f),
+                    fontWeight = if (isReady) FontWeight.Medium else FontWeight.Normal,
                 )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // ── Ad notice ─────────────────────────────────────────────────
+            AnimatedVisibility(
+                visible = adAboutToShow,
+                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 2 },
+                exit = fadeOut(tween(200)),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFF3F4F6))
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("📢", fontSize = 14.sp)
+                    Text(
+                        text = "سيظهر إعلان قصير لدعم التطبيق المجاني",
+                        fontSize = 12.sp,
+                        color = TextSecond,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }
@@ -401,8 +415,9 @@ fun QuizLoadingContent(
 @Composable
 fun LoadingPreview() {
     ZakaTheme {
-        QuizLoadingContent(
-            state = QuizUiState()
+        QuizLoadingContent(state = QuizUiState(), interstitialAdManager = InterstitialAdManager(
+            LocalActivity.current!!
+        )
         ) { }
     }
 }
