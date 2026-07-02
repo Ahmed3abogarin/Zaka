@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.domain.usecases.QuotaStatus
+import com.vtol.zaka.presentation.quiz.components.QuotaIndicator
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
 import com.vtol.zaka.presentation.scan.components.RecentScansSection
@@ -51,7 +52,9 @@ fun ScanContent(
     ) {
 
         // ── Top spacing ───────────────────────────────────────────────────
-        item { Spacer(Modifier.height(56.dp)) }
+        item { Spacer(Modifier.height(32.dp)) }
+        item { QuotaIndicator(remaining = quotaStatus.remaining) }
+        item { Spacer(Modifier.height(18.dp)) }
 
         // ── Header text ───────────────────────────────────────────────────
         item {

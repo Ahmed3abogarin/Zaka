@@ -9,7 +9,7 @@ class CheckQuizQuotaUseCase @Inject constructor(
     operator fun invoke(): QuotaStatus {
         val remaining = quotaManager.getRemainingQuizzes()
         return QuotaStatus(
-            canPlay   = 1 < 0,
+            canPlay   = remaining > 0,
             remaining = remaining,
             limit     = 3,
         )
