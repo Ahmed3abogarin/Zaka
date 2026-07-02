@@ -12,6 +12,11 @@ val Pink40 = Color(0xFF7D5260)
 
 val Purple700 = Color(0xFF5B21B6)
 val Purple500 = Color(0xFF7C3AED)
+
+val PurpleAccent = Color(0xFF6A0DE0)
+val PurpleLink = Color(0xFF5B12B5)
+
+
 val Purple300 = Color(0xFF7F77DD)
 val Purple100 = Color(0xFFEDE9FE)
 val Teal400 = Color(0xFF2DD4BF)
@@ -20,17 +25,16 @@ val Green500 = Color(0xFF22C55E)
 val Orange400 = Color(0xFFFB923C)
 val Orange100 = Color(0xFFFFF7ED)
 val GrayBg = Color(0xFFF3F4F6)
-val GrayCard = Color(0xFFE5E7EB)
 val TextPrimary = Color(0xFF111827)
 val TextSecond = Color(0xFF6B7280)
 
 val BorderColor = Color(0xFFE5E7EB)
+val FieldBackground = Color(0xFFF7F7FA)
 
 val Purple50 = Color(0xFFF5F3FF)
 val RedError = Color(0xFFEF4444)
 val RedLight = Color(0xFFFEF2F2)
 val GreenLight = Color(0xFFF0FDF4)
-val BorderDefault = Color(0xFFE5E7EB)
 val TimerBg = Color(0xFFFFF9C4)
 val TimerText = Color(0xFFF59E0B)
 val NavBg = Color(0xFFF8F7FC)

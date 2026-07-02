@@ -1,7 +1,11 @@
 package com.vtol.zaka.di
 
 import com.google.firebase.ai.GenerativeModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.vtol.zaka.data.repository.AuthRepositoryImpl
 import com.vtol.zaka.data.repository.QuizRepositoryImpl
+import com.vtol.zaka.domain.repository.AuthRepository
 import com.vtol.zaka.domain.repository.QuizRepository
 import dagger.Module
 import dagger.Provides
@@ -17,4 +21,13 @@ object AppModule {
     @Singleton
     fun provideQuizRepository(model: GenerativeModel): QuizRepository =
         QuizRepositoryImpl(model)
+
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): AuthRepository =
+        AuthRepositoryImpl(firebaseAuth, firestore)
 }
