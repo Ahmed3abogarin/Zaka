@@ -10,12 +10,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.ads.InterstitialAdManager
+import com.vtol.zaka.ads.RewardedAdManager
 import com.vtol.zaka.data.local.FileStorageManager
+import com.vtol.zaka.data.local.QuotaManager
 import com.vtol.zaka.domain.models.QuizSession
 import com.vtol.zaka.domain.models.ScanType
 import com.vtol.zaka.domain.models.quiz.Question
+import com.vtol.zaka.domain.usecases.CheckQuizQuotaUseCase
 import com.vtol.zaka.domain.usecases.GenerateFromImage
 import com.vtol.zaka.domain.usecases.GetRecentSessions
+import com.vtol.zaka.domain.usecases.QuotaStatus
 import com.vtol.zaka.domain.usecases.RetakeQuizUseCase
 import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
@@ -46,6 +50,9 @@ class QuizViewModel @Inject constructor(
     private val saveQuizSessionUseCase: SaveQuizSessionUseCase,
     private val retakeQuizUseCase: RetakeQuizUseCase,
     private val fileStorageManager: FileStorageManager,
+    private val checkQuizQuotaUseCase: CheckQuizQuotaUseCase,
+    private val quotaManager: QuotaManager,
+    val rewardedAdManager: RewardedAdManager,
     val interstitialAdManager: InterstitialAdManager,
     getRecentSessions: GetRecentSessions
 ) : ViewModel() {
@@ -56,13 +63,41 @@ class QuizViewModel @Inject constructor(
     val recentScans: StateFlow<List<QuizSession>> = getRecentSessions()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // Expose quota status as state so UI reacts to changes
+    private val _quotaStatus = MutableStateFlow(checkQuizQuotaUseCase())
+    val quotaStatus: StateFlow<QuotaStatus> = _quotaStatus.asStateFlow()
+
     private val _uiEffect = Channel<QuizUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
+
+
+    val isAdAvailable: StateFlow<Boolean> = MutableStateFlow(false).also { flow ->
+        // refresh ad availability every time it might change
+        viewModelScope.launch {
+            while (true) {
+                flow.value = rewardedAdManager.isAdAvailable
+                delay(1000L)
+            }
+        }
+    }.asStateFlow()
 
     private var timerJob: Job? = null
 
     init {
         interstitialAdManager.loadAd()
+    }
+
+    fun loadRewardedAd() {
+        rewardedAdManager.loadAd(
+            onLoaded = { /* isAdAvailable updates automatically */ },
+            onFailed = { _state.update { it.copy(error = "Couldn't load ad") } },
+        )
+    }
+
+    fun onUserRewarded() {
+        // Give one extra quiz — increment the limit temporarily
+        quotaManager.grantBonusQuiz()
+        _state.update { it.copy(screenState = QuizScreenState.Loading) }
     }
 
 
@@ -76,7 +111,17 @@ class QuizViewModel @Inject constructor(
         }
     }
 
+    // Refresh it after every completed quiz
+    private fun refreshQuota() {
+        _quotaStatus.update { checkQuizQuotaUseCase() }
+    }
+
     fun generateFromPdf(pdf: ByteArray, fileName: String) {
+//        val quota = checkQuizQuotaUseCase()
+//        if (!quota.canPlay) {
+//            _state.update { it.copy(screenState = QuizScreenState.QuotaExceeded) }
+//            return
+//        }
         val storedPath = fileStorageManager.savePdf(pdf, fileName)
         _state.update {
             it.copy(
@@ -126,6 +171,11 @@ class QuizViewModel @Inject constructor(
     }
 
     fun generateFromImage(bitmap: Bitmap) {
+//        val quota = checkQuizQuotaUseCase()
+//        if (!quota.canPlay) {
+//            _state.update { it.copy(screenState = QuizScreenState.QuotaExceeded) }
+//            return
+//        }
         val error = validateImageUseCase(bitmap)
         if (error != null) {
             _state.update { it.copy(screenState = QuizScreenState.Error(error.messageAr)) }
@@ -135,10 +185,10 @@ class QuizViewModel @Inject constructor(
         val storedPath = fileStorageManager.saveImage(bitmap)
         _state.update {
             it.copy(
-                scanType       = ScanType.IMAGE,
+                scanType = ScanType.IMAGE,
                 sourceFileName = "صورة ممسوحة",
                 storedFilePath = storedPath,
-                screenState    = QuizScreenState.Loading,
+                screenState = QuizScreenState.Loading,
             )
         }
         viewModelScope.launch {
@@ -148,7 +198,15 @@ class QuizViewModel @Inject constructor(
             generateFromImageUseCase(bitmap)
                 .fold(
                     onSuccess = { questions -> _state.update { it.copy(questions = questions) } },
-                    onFailure = { e -> _state.update { it.copy(screenState = QuizScreenState.Error(e.message ?: "حدث خطأ غير متوقع")) } }
+                    onFailure = { e ->
+                        _state.update {
+                            it.copy(
+                                screenState = QuizScreenState.Error(
+                                    e.message ?: "حدث خطأ غير متوقع"
+                                )
+                            )
+                        }
+                    }
                 )
         }
     }
@@ -184,6 +242,8 @@ class QuizViewModel @Inject constructor(
         if (state.isLastQuestion) {
             viewModelScope.launch {
                 stopTimer()
+                quotaManager.incrementCount()
+                refreshQuota()
                 saveQuizSessionUseCase(state)
                 _uiEffect.trySend(QuizUiEffect.NavigateToResult)
             }
@@ -254,6 +314,10 @@ class QuizViewModel @Inject constructor(
         }
     }
 
+    fun clearError() {
+        _state.update { it.copy(error = null) }
+    }
+
     private fun uriToBitmap(context: Context, uri: Uri): Bitmap {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val source = ImageDecoder.createSource(context.contentResolver, uri)
@@ -272,7 +336,9 @@ class QuizViewModel @Inject constructor(
 // ─── Screen State — what to SHOW ──────────────────────────────────────────────
 sealed class QuizScreenState {
     object Loading : QuizScreenState()          // show loading UI + ad
-    object Ready : QuizScreenState()          // show loading UI + ad
+    object Ready : QuizScreenState() // show loading UI + ad
+
+    //    object QuotaExceeded  : QuizScreenState()
     data class Error(val message: String) : QuizScreenState()
 }
 
@@ -288,7 +354,8 @@ data class QuizUiState(
     val elapsedSeconds: Int = 0,
     val scanType: ScanType = ScanType.PDF,
     val sourceFileName: String = "",
-    val storedFilePath: String = ""
+    val storedFilePath: String = "",
+    val error: String? = null
 ) {
     val answered get() = selectedIndex != null
     val currentQuestion get() = questions.getOrNull(currentQuestionIndex)

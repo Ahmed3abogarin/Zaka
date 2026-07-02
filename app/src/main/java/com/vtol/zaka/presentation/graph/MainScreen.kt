@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -44,10 +45,11 @@ fun MainScreen() {
     val quizViewModel: QuizViewModel = hiltViewModel()
 
     val tabs = listOf(
-        BottomNavItem("Home",     Icons.Default.Home,     HomeRoute),
-        BottomNavItem("Scan",     Icons.Default.Person,   ScanRoute),
+        BottomNavItem("Home", Icons.Default.Home, HomeRoute),
+        BottomNavItem("Scan", Icons.Default.Person, ScanRoute),
         BottomNavItem("Progress", Icons.Default.BarChart, ProgressRoute),
     )
+
 
     Scaffold(
         bottomBar = {
@@ -61,8 +63,8 @@ fun MainScreen() {
 
             AnimatedVisibility(
                 visible = showBottomNav,
-                enter   = slideInVertically(animationSpec = tween(200)) { it },
-                exit    = slideOutVertically(animationSpec = tween(200)) { it },
+                enter = slideInVertically(animationSpec = tween(200)) { it },
+                exit = slideOutVertically(animationSpec = tween(200)) { it },
             ) {
                 val selectedIndex = tabs.indexOfFirst { tab ->
                     currentDestination?.hierarchy?.any {
@@ -71,14 +73,14 @@ fun MainScreen() {
                 }.coerceAtLeast(0)
 
                 ArabicBottomNavBar(
-                    selectedIndex  = selectedIndex,
+                    selectedIndex = selectedIndex,
                     onItemSelected = { index ->
                         navController.navigate(tabs[index].route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
                             launchSingleTop = true
-                            restoreState    = true
+                            restoreState = true
                         }
                     }
                 )
@@ -86,49 +88,60 @@ fun MainScreen() {
         }
     ) { innerPadding ->
         NavHost(
-            navController    = navController,
+            navController = navController,
             startDestination = HomeRoute,
-            modifier         = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
         ) {
 
             // ── Home ──────────────────────────────────────────────────────
             composable<HomeRoute> {
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 val recentQuizzes by homeViewModel.recentQuizzes.collectAsState()
+                val isAdAvailable by quizViewModel.isAdAvailable.collectAsState()
+                val quotaStatus by quizViewModel.quotaStatus.collectAsState()
 
                 HomeScreen(
-                    recentQuizzes     = recentQuizzes,
+                    rewardedAdManager = quizViewModel.rewardedAdManager,
+                    isAdAvailable = isAdAvailable,
+                    recentQuizzes = recentQuizzes,
+                    quotaStatus = quotaStatus,
                     navigateToDetails = { id ->
                         navController.navigate(QuizDetailsRoute(id))
                     },
-                    onPdfSelected     = { bytes, name ->
+                    onPdfSelected = { bytes, name ->
                         quizViewModel.generateFromPdf(bytes, name)
                         navController.navigate(QuizRoute)
                     },
-                    onImageCaptured   = { bitmap ->
+                    onImageCaptured = { bitmap ->
                         quizViewModel.generateFromImage(bitmap)
                         navController.navigate(QuizRoute)
                     },
+                    onUserRewarded = {
+                        quizViewModel.onUserRewarded()
+                    },
+                    loadRewardedAd = {
+                        quizViewModel.loadRewardedAd()
+                    }
                 )
             }
 
             // ── Scan ──────────────────────────────────────────────────────
             composable<ScanRoute> {
                 ScanScreen(
-                    viewModel        = quizViewModel,
+                    viewModel = quizViewModel,
                     navigateToViewer = { sessionId ->
                         navController.navigate(FileViewerRoute(sessionId))
                     },
-                    navigateToQuiz   = {
+                    navigateToQuiz = {
                         navController.navigate(QuizRoute)
-                    },
+                    }
                 )
             }
 
             // ── Quiz ──────────────────────────────────────────────────────
             composable<QuizRoute> {
                 QuizScreen(
-                    viewModel        = quizViewModel,
+                    viewModel = quizViewModel,
                     navigateToResult = {
                         navController.navigate(ResultRoute)
                     },
@@ -142,8 +155,8 @@ fun MainScreen() {
             composable<ResultRoute> {
                 val state by quizViewModel.state.collectAsState()
                 ResultScreen(
-                    state      = state,
-                    onHome     = {
+                    state = state,
+                    onHome = {
                         navController.navigate(HomeRoute) {
                             popUpTo(HomeRoute) { inclusive = false }
                         }
@@ -168,14 +181,14 @@ fun MainScreen() {
                 val state by detailViewModel.state.collectAsState()
 
                 QuizDetailScreen(
-                    state            = state,
+                    state = state,
                     onNavigateToQuiz = { id ->
                         quizViewModel.retakeFromHistory(id)
                         navController.navigate(QuizRoute)
                     },
-                    onBack           = {
+                    onBack = {
                         navController.popBackStack()
-                    },
+                    }
                 )
             }
 
@@ -190,10 +203,17 @@ fun MainScreen() {
 }
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-@Serializable object HomeRoute
-@Serializable object ScanRoute
-@Serializable object QuizRoute
-@Serializable object ResultRoute
-@Serializable object ProgressRoute
-@Serializable data class QuizDetailsRoute(val sessionId: Int)
-@Serializable data class FileViewerRoute(val sessionId: Int)
+@Serializable
+object HomeRoute
+@Serializable
+object ScanRoute
+@Serializable
+object QuizRoute
+@Serializable
+object ResultRoute
+@Serializable
+object ProgressRoute
+@Serializable
+data class QuizDetailsRoute(val sessionId: Int)
+@Serializable
+data class FileViewerRoute(val sessionId: Int)

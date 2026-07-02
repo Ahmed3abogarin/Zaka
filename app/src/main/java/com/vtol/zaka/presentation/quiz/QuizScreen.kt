@@ -1,10 +1,12 @@
 package com.vtol.zaka.presentation.quiz
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -17,7 +19,7 @@ fun QuizScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
-
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect {
@@ -27,14 +29,22 @@ fun QuizScreen(
         }
     }
 
+    LaunchedEffect(state.error) {
+        if (state.error != null) {
+            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+    }
+
+
     when (state.screenState) {
         is QuizScreenState.Loading -> {
             QuizLoadingContent(
                 interstitialAdManager = viewModel.interstitialAdManager,
                 state = state,
                 onReadyToNavigate = {
-                viewModel.onQuizReady()
-            })
+                    viewModel.onQuizReady()
+                })
         }
 
         is QuizScreenState.Ready -> {

@@ -1,6 +1,7 @@
 package com.vtol.zaka.presentation.home
 
 import android.graphics.Bitmap
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -21,24 +22,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import com.vtol.zaka.ads.RewardedAdManager
 import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.domain.models.RecentQuiz
+import com.vtol.zaka.domain.usecases.QuotaStatus
 import com.vtol.zaka.presentation.home.components.ActionCard
 import com.vtol.zaka.presentation.home.components.GreetingRow
 import com.vtol.zaka.presentation.home.components.HeroCard
 import com.vtol.zaka.presentation.home.components.RecentQuizCard
 import com.vtol.zaka.presentation.home.components.SectionTitle
 import com.vtol.zaka.presentation.home.components.CategoriesRow
+import com.vtol.zaka.presentation.quiz.components.QuotaExceededSheet
 import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
 fun HomeScreen(
+    rewardedAdManager: RewardedAdManager,
+    isAdAvailable: Boolean,
+    quotaStatus: QuotaStatus,
     recentQuizzes: List<RecentQuiz>,
     navigateToDetails: (Int) -> Unit,
     onPdfSelected: (ByteArray, String) -> Unit,   // ← handle file directly
     onImageCaptured: (Bitmap) -> Unit,
+    loadRewardedAd: () -> Unit,
+    onUserRewarded: () -> Unit,
 ) {
+
+    val activity = LocalActivity.current
+
+    LaunchedEffect(Unit) {
+        loadRewardedAd()
+    }
+
+    var showQuotaSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -57,6 +74,34 @@ fun HomeScreen(
     ) { bitmap ->
         bitmap?.let { onImageCaptured(it) }
     }
+
+
+
+    if (showQuotaSheet) {
+        QuotaExceededSheet(
+            remaining = quotaStatus.remaining,
+            isAdAvailable = isAdAvailable,
+            onDismiss = { showQuotaSheet = false },
+            onUpgrade = { /* navigate to paywall */ },
+            onWatchAd = {
+                activity?.let {
+                    rewardedAdManager.showAd(
+                        activity = activity,
+                        onRewarded = {
+                            onUserRewarded()
+                            showQuotaSheet = false
+                            // now trigger the scan they originally wanted
+                            pdfLauncher.launch("application/pdf")
+                        },
+                        onDismissed = {
+                            // user closed ad without finishing — don't grant reward
+                        },
+                    )
+                }
+            },
+        )
+    }
+
 
     Box(
         modifier = Modifier
@@ -149,14 +194,20 @@ fun HomeScreen(
                         description = "التقط صورة من مذكراتك",
                         icon = Icons.Outlined.DocumentScanner,
                         tint = Purple700,
-                        onClick = { cameraLauncher.launch(null) }
+                        onClick = {
+                            if (quotaStatus.canPlay) cameraLauncher.launch(null)
+                            else showQuotaSheet = true
+                        }
                     )
                     ActionCard(
                         label = "ارفع PDF",
                         description = "استيراد دفاتر او مذكرات",
                         icon = Icons.Outlined.PictureAsPdf,
                         tint = Purple500,
-                        onClick = { pdfLauncher.launch("application/pdf") }
+                        onClick = {
+                            if (quotaStatus.canPlay) pdfLauncher.launch("application/pdf")
+                            else showQuotaSheet = true
+                        }
                     )
 
                 }
@@ -200,10 +251,21 @@ fun HomeScreenPreview() {
     MaterialTheme {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             HomeScreen(
+                quotaStatus = QuotaStatus(false, 3, 3),
                 recentQuizzes = listOf(),
                 navigateToDetails = {},
-                onPdfSelected = {_, _ ->},
-                onImageCaptured = {})
+                onPdfSelected = { _, _ -> },
+                onImageCaptured = {},
+                isAdAvailable = false,
+                loadRewardedAd = {
+
+                },
+                onUserRewarded = {
+
+                },
+                rewardedAdManager = RewardedAdManager(LocalContext.current)
+            )
+
 
         }
     }

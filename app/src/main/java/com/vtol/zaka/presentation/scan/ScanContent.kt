@@ -1,9 +1,5 @@
 package com.vtol.zaka.presentation.scan
 
-import android.graphics.Bitmap
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,13 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.domain.models.QuizSession
+import com.vtol.zaka.domain.usecases.QuotaStatus
 import com.vtol.zaka.presentation.scan.components.AiTipCard
 import com.vtol.zaka.presentation.scan.components.CameraButton
 import com.vtol.zaka.presentation.scan.components.RecentScansSection
@@ -39,38 +34,14 @@ import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
 fun ScanContent(
+    quotaStatus: QuotaStatus,
     recentSessions: List<QuizSession>,
     navigateToViewer: (Int) -> Unit,
-    generateFromPdf: (ByteArray, String) -> Unit,
-    generateFromGallery: (Uri) -> Unit,
-    generateFromCamera: (Bitmap) -> Unit,
+    showBottonSheet: () -> Unit,
+    launchPdf: () -> Unit,
+    launchCamera: () -> Unit,
+    launchGallery: () -> Unit,
 ) {
-    val context = LocalContext.current
-
-    // PDF picker
-    val pdfLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            val bytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: return@let
-            val fileName = getFileName(context, uri)
-            generateFromPdf(bytes, fileName)
-        }
-    }
-
-    // Camera picker
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        bitmap?.let { generateFromCamera(it) }
-    }
-
-    // gallery launcher
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { generateFromGallery(it) }
-    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -111,7 +82,12 @@ fun ScanContent(
         item { Spacer(Modifier.height(40.dp)) }
 
         // ── Camera button ─────────────────────────────────────────────────
-        item { CameraButton { cameraLauncher.launch(null) } }
+        item {
+            CameraButton {
+                if (quotaStatus.canPlay) launchCamera()
+                else showBottonSheet()
+            }
+        }
 
         item { Spacer(Modifier.height(40.dp)) }
 
@@ -128,7 +104,8 @@ fun ScanContent(
                     icon = Icons.Outlined.Image,
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        galleryLauncher.launch("image/*")
+                        if (quotaStatus.canPlay) launchGallery()
+                        else showBottonSheet()
                     }
                 )
                 SecondaryActionCard(
@@ -136,7 +113,8 @@ fun ScanContent(
                     icon = Icons.Outlined.PictureAsPdf,
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        pdfLauncher.launch("application/pdf")
+                        if (quotaStatus.canPlay) launchPdf()
+                        else showBottonSheet()
                     }
                 )
             }
