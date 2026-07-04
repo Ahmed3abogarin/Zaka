@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.vtol.zaka.presentation.graph.AppHost
@@ -19,7 +22,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             ZakaTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    AppHost()
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        AppHost()
+                    }
                 }
             }
         }

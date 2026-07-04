@@ -74,6 +74,7 @@ fun SignUpScreen(
             .fillMaxSize()
             .background(Color.White)
             .padding(horizontal = 24.dp)
+            .imePadding()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -83,11 +84,11 @@ fun SignUpScreen(
         Image(
             painter = painterResource(R.drawable.ic_app),
             contentDescription = null,
-            modifier = Modifier.height(122.dp)
+            modifier = Modifier.height(92.dp)
         )
 
-
         Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "ذكــاء",
             style = MaterialTheme.typography.headlineLarge.copy(
@@ -96,8 +97,8 @@ fun SignUpScreen(
                 brush = rememberShiningBrush()
             )
         )
-        Spacer(modifier = Modifier.height(8.dp))
 
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = "ابدأ رحلة التعلم الذكي",
@@ -208,7 +209,9 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(28.dp))
 
         // Login link
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = "لديك حساب بالفعل؟ ",
                 color = Color.Black,
@@ -216,9 +219,7 @@ fun SignUpScreen(
                 fontWeight = FontWeight.Medium
             )
             Text(
-                modifier = Modifier.clickable {
-                    onLoginClick()
-                },
+                modifier = Modifier.clickable(onClick = onLoginClick),
                 text = "سجل دخولك",
                 color = PurpleLink,
                 fontSize = 14.sp,

@@ -1,17 +1,15 @@
 package com.vtol.zaka.presentation.graph
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vtol.zaka.presentation.register.login.LoginScreen
+import com.vtol.zaka.presentation.register.login.LoginViewModel
 import com.vtol.zaka.presentation.register.signup.SignUpScreen
 import com.vtol.zaka.presentation.register.signup.SignUpViewModel
 import kotlinx.serialization.Serializable
@@ -27,14 +25,23 @@ fun AuthNavGraph() {
                 state = state,
                 event = viewModel::onEvent,
                 onLoginClick = {
+                    Log.d("BUTTONCLICKS", "Navigate to Login screen button is clicked!")
                     navController.navigate(LoginRoute)
                 }
             )
         }
         composable<LoginRoute> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("LOGIN SCREEN")
-            }
+            val viewModel: LoginViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsState()
+
+            LoginScreen(
+                state = state,
+                event = viewModel::onEvent,
+                onSignUpClick = {
+                    Log.d("BUTTONCLICKS", "Navigate to sign up screen button is clicked!")
+                    navController.navigate(SignUpRoute)
+                }
+            )
         }
     }
 }
