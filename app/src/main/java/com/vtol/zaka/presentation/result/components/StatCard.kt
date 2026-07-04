@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
@@ -36,7 +36,7 @@ fun StatCard(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, BorderDefault, RoundedCornerShape(16.dp))
+            .border(1.dp, BorderColor, RoundedCornerShape(16.dp))
             .background(Color.White)
             .padding(vertical = 16.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

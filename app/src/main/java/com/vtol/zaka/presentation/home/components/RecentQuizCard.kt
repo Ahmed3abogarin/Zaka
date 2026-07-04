@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.domain.models.RecentQuiz
-import com.vtol.zaka.ui.theme.GrayCard
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
@@ -43,7 +43,7 @@ fun RecentQuizCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(width = 1.dp, color = GrayCard),
+        border = BorderStroke(width = 1.dp, color = BorderColor),
         onClick = { onClick(quiz.sessionId) }
     ) {
         Row(
@@ -102,7 +102,7 @@ fun RecentQuizCard(
                         .height(6.dp)
                         .clip(RoundedCornerShape(3.dp)),
                     color = quiz.accentColor,
-                    trackColor = GrayCard,
+                    trackColor = BorderColor,
                 )
             }
             Icon(

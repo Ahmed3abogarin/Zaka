@@ -29,7 +29,7 @@ import com.vtol.zaka.presentation.quiz.model.getFunFacts
 import com.vtol.zaka.presentation.quiz.model.imageSteps
 import com.vtol.zaka.presentation.quiz.model.pdfSteps
 import com.vtol.zaka.presentation.quiz.model.topicSteps
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.GrayBg
 import com.vtol.zaka.ui.theme.Green500
 import com.vtol.zaka.ui.theme.Purple300
@@ -263,7 +263,7 @@ fun QuizLoadingContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .border(0.5.dp, BorderDefault, RoundedCornerShape(14.dp))
+                    .border(0.5.dp, BorderColor, RoundedCornerShape(14.dp))
                     .background(GrayBg)
                     .padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -339,7 +339,7 @@ fun QuizLoadingContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .border(0.5.dp, BorderDefault, RoundedCornerShape(12.dp))
+                            .border(0.5.dp, BorderColor, RoundedCornerShape(12.dp))
                             .background(GrayBg)
                             .padding(14.dp),
                     ) {

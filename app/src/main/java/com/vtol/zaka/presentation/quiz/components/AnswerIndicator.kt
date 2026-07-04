@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.vtol.zaka.presentation.quiz.model.AnswerState
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.Green500
 import com.vtol.zaka.ui.theme.RedError
 
@@ -29,7 +29,7 @@ fun AnswerIndicator(state: AnswerState, activeColor: Color) {
                 modifier = Modifier
                     .size(22.dp)
                     .clip(CircleShape)
-                    .border(1.5.dp, BorderDefault, CircleShape),
+                    .border(1.5.dp, BorderColor, CircleShape),
             )
         }
 

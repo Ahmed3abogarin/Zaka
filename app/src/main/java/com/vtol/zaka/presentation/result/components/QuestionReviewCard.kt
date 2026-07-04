@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.vtol.zaka.domain.models.quiz.Difficulty
 import com.vtol.zaka.domain.models.quiz.Question
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.Green500
 import com.vtol.zaka.ui.theme.RedError
 import com.vtol.zaka.ui.theme.TextPrimary
@@ -58,7 +58,7 @@ fun QuestionReviewCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, BorderDefault),
+        border = BorderStroke(1.dp, BorderColor),
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             // Left accent bar
@@ -122,7 +122,7 @@ fun QuestionReviewCard(
                     lineHeight = 24.sp,
                 )
 
-                HorizontalDivider(color = BorderDefault, thickness = 0.5.dp)
+                HorizontalDivider(color = BorderColor, thickness = 0.5.dp)
 
                 // User's answer
                 Row(

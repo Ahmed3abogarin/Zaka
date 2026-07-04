@@ -1,5 +1,6 @@
 package com.vtol.zaka.presentation.register.signup
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.R
+import com.vtol.zaka.presentation.components.LoadingIndicator
 import com.vtol.zaka.presentation.register.components.LabeledField
 import com.vtol.zaka.presentation.register.components.TermsText
 import com.vtol.zaka.ui.theme.BorderColor
@@ -35,6 +39,7 @@ import com.vtol.zaka.ui.theme.Purple700
 import com.vtol.zaka.ui.theme.PurpleAccent
 import com.vtol.zaka.ui.theme.PurpleLink
 import com.vtol.zaka.ui.theme.TextSecond
+import com.vtol.zaka.util.showToast
 
 private val ButtonGradient = Brush.horizontalGradient(
     colors = listOf(Purple700, PurpleAccent)
@@ -42,15 +47,29 @@ private val ButtonGradient = Brush.horizontalGradient(
 
 @Composable
 fun SignUpScreen(
-    onCreateAccount: (name: String, email: String, password: String) -> Unit = { _, _, _ -> },
-    onGoogleSignUp: () -> Unit = {},
-    onLoginClick: () -> Unit = {}
+    state: SignUpUiState,
+    event: (SignUpEvent) -> Unit,
+    onLoginClick: () -> Unit,
 ) {
-    // The design is Arabic, so the whole screen is laid out right-to-left.
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
     var passwordVisible by remember { mutableStateOf(false) }
+
+
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(state.isLoading) {
+        if (state.isLoading) {
+            focusManager.clearFocus()
+        }
+    }
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            event(SignUpEvent.ErrorShown)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -101,8 +120,8 @@ fun SignUpScreen(
         ) {
             LabeledField(
                 label = "الاسم الكامل",
-                value = fullName,
-                onValueChange = { fullName = it },
+                value = state.name,
+                onValueChange = { event(SignUpEvent.OnNameChanged(it)) },
                 placeholder = "أدخل اسمك الثلاثي",
                 icon = Icons.Filled.Person
             )
@@ -111,8 +130,8 @@ fun SignUpScreen(
 
             LabeledField(
                 label = "البريد الإلكتروني",
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = { event(SignUpEvent.OnEmailChanged(it)) },
                 placeholder = "example@domain.com",
                 icon = Icons.Filled.Email,
                 keyboardType = KeyboardType.Email
@@ -122,8 +141,8 @@ fun SignUpScreen(
 
             LabeledField(
                 label = "كلمة المرور",
-                value = password,
-                onValueChange = { password = it },
+                value = state.password,
+                onValueChange = { event(SignUpEvent.OnPasswordChanged(it)) },
                 placeholder = "••••••••",
                 icon = Icons.Filled.Lock,
                 keyboardType = KeyboardType.Password,
@@ -144,7 +163,7 @@ fun SignUpScreen(
                 contentAlignment = Alignment.Center
             ) {
                 TextButton(
-                    onClick = { onCreateAccount(fullName, email, password) },
+                    onClick = { event(SignUpEvent.OnSignUpClicked) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Text(
@@ -182,7 +201,7 @@ fun SignUpScreen(
 
             // Google sign up button
             OutlinedButton(
-                onClick = onGoogleSignUp,
+                onClick = { context.showToast() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -232,12 +251,20 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
     }
+
+    if (state.isLoading) {
+        LoadingIndicator()
+    }
 }
 
 @Preview(showBackground = true, widthDp = 412, heightDp = 915)
 @Composable
 private fun SignUpScreenPreview() {
     MaterialTheme {
-        SignUpScreen()
+        SignUpScreen(
+            SignUpUiState(),
+            event = {},
+            onLoginClick = {}
+        )
     }
 }

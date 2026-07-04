@@ -1,4 +1,4 @@
-package com.vtol.zaka.presentation.graph
+package com.vtol.zaka.presentation.graph.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

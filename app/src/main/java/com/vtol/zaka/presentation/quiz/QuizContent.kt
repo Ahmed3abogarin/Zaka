@@ -29,7 +29,7 @@ import com.vtol.zaka.presentation.quiz.components.QuestionBadge
 import com.vtol.zaka.presentation.quiz.components.QuizTopBar
 import com.vtol.zaka.presentation.quiz.model.AnswerState
 import com.vtol.zaka.presentation.quiz.model.QuizOption
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.TextPrimary
 
@@ -103,7 +103,7 @@ fun QuizContent(
                         .fillMaxWidth()
                         .height(4.dp),
                     color = Purple500,
-                    trackColor = BorderDefault,
+                    trackColor = BorderColor,
                 )
 
                 // ── Scrollable content ────────────────────────────────────────

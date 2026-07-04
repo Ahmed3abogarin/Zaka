@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import com.vtol.zaka.presentation.graph.MainScreen
+import com.vtol.zaka.presentation.graph.AppHost
 import com.vtol.zaka.ui.theme.ZakaTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ZakaTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    MainScreen()
+                    AppHost()
                 }
             }
         }

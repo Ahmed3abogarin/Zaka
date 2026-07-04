@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.presentation.details.QuizDetailScreen
 import com.vtol.zaka.presentation.details.QuizDetailsViewModel
 import com.vtol.zaka.presentation.graph.components.ArabicBottomNavBar
+import com.vtol.zaka.presentation.graph.model.BottomNavItem
 import com.vtol.zaka.presentation.home.HomeScreen
 import com.vtol.zaka.presentation.home.HomeViewModel
 import com.vtol.zaka.presentation.progress.ProgressScreen

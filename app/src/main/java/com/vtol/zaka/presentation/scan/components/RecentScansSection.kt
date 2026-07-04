@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.domain.models.QuizSession
-import com.vtol.zaka.ui.theme.BorderDefault
+import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
@@ -32,7 +32,7 @@ fun RecentScansSection(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, BorderDefault, RoundedCornerShape(16.dp))
+            .border(1.dp, BorderColor, RoundedCornerShape(16.dp))
             .background(Color.White),
     ) {
         Text(
@@ -43,7 +43,7 @@ fun RecentScansSection(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
         )
 
-        HorizontalDivider(color = BorderDefault, thickness = 0.5.dp)
+        HorizontalDivider(color = BorderColor, thickness = 0.5.dp)
 
         if (scans.isEmpty()) {
             Box(
@@ -60,7 +60,7 @@ fun RecentScansSection(
                 if (index < scans.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = BorderDefault,
+                        color = BorderColor,
                         thickness = 0.5.dp,
                     )
                 }
