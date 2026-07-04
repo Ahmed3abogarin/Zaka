@@ -89,10 +89,10 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             user.reload().await()
             AuthState.Authenticated
-        } catch (e: FirebaseAuthInvalidUserException) {
+        } catch (_: FirebaseAuthInvalidUserException) {
             auth.signOut()
             AuthState.Unauthenticated
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             auth.signOut()
             AuthState.Unauthenticated
         }
