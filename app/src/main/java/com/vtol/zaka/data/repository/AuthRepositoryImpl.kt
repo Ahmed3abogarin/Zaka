@@ -74,9 +74,11 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun logout() {
-        TODO("Not yet implemented")
+//        CoroutineScope(Dispatchers.IO).launch{
+//            db.clearAllTables()
+//        }
+        auth.signOut()
     }
-
     private suspend fun saveUserToFirestore(user: User){
         firestore.collection(USERS_COLLECTION)
             .document(user.uid)
