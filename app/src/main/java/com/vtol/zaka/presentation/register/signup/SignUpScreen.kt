@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -33,19 +32,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.R
 import com.vtol.zaka.presentation.components.LoadingIndicator
+import com.vtol.zaka.presentation.components.ZakaButton
 import com.vtol.zaka.presentation.components.rememberShiningBrush
+import com.vtol.zaka.presentation.register.components.GoogleLoginButton
 import com.vtol.zaka.presentation.register.components.LabeledField
 import com.vtol.zaka.presentation.register.components.TermsText
 import com.vtol.zaka.ui.theme.BorderColor
 import com.vtol.zaka.ui.theme.Purple700
-import com.vtol.zaka.ui.theme.PurpleAccent
 import com.vtol.zaka.ui.theme.PurpleLink
 import com.vtol.zaka.ui.theme.TextSecond
 import com.vtol.zaka.util.showToast
-
-private val ButtonGradient = Brush.horizontalGradient(
-    colors = listOf(Purple700, PurpleAccent)
-)
 
 @Composable
 fun SignUpScreen(
@@ -94,7 +90,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "ذكــاء",
-            style =  MaterialTheme.typography.headlineLarge.copy(
+            style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = 42.sp,
                 fontWeight = FontWeight.SemiBold,
                 brush = rememberShiningBrush()
@@ -111,14 +107,14 @@ fun SignUpScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "انضم إلى آلاف الطلاب المتميزين اليوم",
-            color = TextSecond,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center
-        )
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Text(
+//            text = "انضم إلى آلاف الطلاب المتميزين اليوم",
+//            color = TextSecond,
+//            fontSize = 14.sp,
+//            textAlign = TextAlign.Center
+//        )
 
         Spacer(modifier = Modifier.height(28.dp))
 
@@ -132,6 +128,7 @@ fun SignUpScreen(
                 .padding(20.dp)
         ) {
             LabeledField(
+                errorTxt = state.nameError,
                 label = "الاسم الكامل",
                 value = state.name,
                 onValueChange = { event(SignUpEvent.OnNameChanged(it)) },
@@ -142,6 +139,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(18.dp))
 
             LabeledField(
+                errorTxt = state.emailError,
                 label = "البريد الإلكتروني",
                 value = state.email,
                 onValueChange = { event(SignUpEvent.OnEmailChanged(it)) },
@@ -153,6 +151,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(18.dp))
 
             LabeledField(
+                errorTxt = state.passwordError,
                 label = "كلمة المرور",
                 value = state.password,
                 onValueChange = { event(SignUpEvent.OnPasswordChanged(it)) },
@@ -167,25 +166,10 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Create account button
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(ButtonGradient),
-                contentAlignment = Alignment.Center
+            ZakaButton(
+                text = "إنشاء حساب"
             ) {
-                TextButton(
-                    onClick = { event(SignUpEvent.OnSignUpClicked) },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = "إنشاء حساب",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                event(SignUpEvent.OnSignUpClicked)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -213,29 +197,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Google sign up button
-            OutlinedButton(
-                onClick = { context.showToast() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, BorderColor),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
-            ) {
-                Text(
-                    text = "التسجيل بواسطة جوجل",
-                    color = Color.Black,
-                    fontSize = 15.sp
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                // Replace with an actual Google "G" logo asset in production
-                Text(
-                    text = "G",
-                    color = Color(0xFF4285F4),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
+            GoogleLoginButton { context.showToast() }
 
             Spacer(modifier = Modifier.height(18.dp))
 
@@ -254,15 +216,15 @@ fun SignUpScreen(
                 fontWeight = FontWeight.Medium
             )
             Text(
+                modifier = Modifier.clickable {
+                    onLoginClick()
+                },
                 text = "سجل دخولك",
                 color = PurpleLink,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable(onClick = onLoginClick)
+                fontWeight = FontWeight.Bold
             )
         }
-
-
         Spacer(modifier = Modifier.height(32.dp))
     }
 

@@ -25,13 +25,14 @@ fun AuthNavGraph() {
             val state by viewModel.uiState.collectAsState()
             SignUpScreen(
                 state = state,
-                event = viewModel::onEvent
-            ) {
-                navController.navigate(MainScreenRoute)
-            }
+                event = viewModel::onEvent,
+                onLoginClick = {
+                    navController.navigate(LoginRoute)
+                }
+            )
         }
         composable<LoginRoute> {
-            Box(modifier=  Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("LOGIN SCREEN")
             }
         }

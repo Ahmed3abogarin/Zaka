@@ -1,6 +1,7 @@
 package com.vtol.zaka.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.vtol.zaka.domain.models.auth.AuthState
@@ -80,5 +81,20 @@ class AuthRepositoryImpl @Inject constructor(
         firestore.collection(USERS_COLLECTION)
             .document(user.uid)
             .set(user, SetOptions.merge()).await()
+    }
+
+    override suspend fun validateCurrentUser(): AuthState {
+        val user = auth.currentUser ?: return AuthState.Unauthenticated
+
+        return try {
+            user.reload().await()
+            AuthState.Authenticated
+        } catch (e: FirebaseAuthInvalidUserException) {
+            auth.signOut()
+            AuthState.Unauthenticated
+        } catch (e: Exception) {
+            auth.signOut()
+            AuthState.Unauthenticated
+        }
     }
 }

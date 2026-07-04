@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.ui.theme.BorderColor
@@ -38,6 +39,7 @@ fun LabeledField(
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
     passwordVisible: Boolean = false,
+    errorTxt: String? = null,
     onTogglePasswordVisibility: (() -> Unit)? = null
 ) {
     Column {
@@ -54,6 +56,7 @@ fun LabeledField(
             placeholder = {
                 Text(text = placeholder, color = Color(0xFFB0B3B8), fontSize = 14.sp)
             },
+            isError = errorTxt != null,
             singleLine = true,
             leadingIcon = {
                 // Placed on the "leading" side, which visually renders on the
@@ -81,10 +84,16 @@ fun LabeledField(
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = FieldBackground,
                 focusedContainerColor = FieldBackground,
+                errorContainerColor = FieldBackground,
                 unfocusedBorderColor = BorderColor,
                 focusedBorderColor = PurpleAccent
             ),
             textStyle = androidx.compose.ui.text.TextStyle(textAlign = TextAlign.Right),
+            supportingText = {
+                if (errorTxt != null) {
+                    Text(errorTxt)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }

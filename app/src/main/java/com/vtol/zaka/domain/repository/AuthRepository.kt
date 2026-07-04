@@ -13,4 +13,6 @@ interface AuthRepository {
     suspend fun resetPassword(email: String): Result<Unit>
 
     fun logout()
+
+    suspend fun validateCurrentUser(): AuthState
 }
