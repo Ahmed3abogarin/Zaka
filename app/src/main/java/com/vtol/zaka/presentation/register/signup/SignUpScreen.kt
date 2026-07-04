@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.R
 import com.vtol.zaka.presentation.components.LoadingIndicator
+import com.vtol.zaka.presentation.components.rememberShiningBrush
 import com.vtol.zaka.presentation.register.components.LabeledField
 import com.vtol.zaka.presentation.register.components.TermsText
 import com.vtol.zaka.ui.theme.BorderColor
@@ -83,12 +85,23 @@ fun SignUpScreen(
 
         // Logo
         Image(
-            painter = painterResource(R.drawable.ic_app_icon),
+            painter = painterResource(R.drawable.ic_app),
             contentDescription = null,
             modifier = Modifier.height(122.dp)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "ذكــاء",
+            style =  MaterialTheme.typography.headlineLarge.copy(
+                fontSize = 42.sp,
+                fontWeight = FontWeight.SemiBold,
+                brush = rememberShiningBrush()
+            )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
 
         Text(
             text = "ابدأ رحلة التعلم الذكي",
@@ -248,6 +261,7 @@ fun SignUpScreen(
                 modifier = Modifier.clickable(onClick = onLoginClick)
             )
         }
+
 
         Spacer(modifier = Modifier.height(32.dp))
     }
