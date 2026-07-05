@@ -1,5 +1,6 @@
 package com.vtol.zaka.presentation.graph
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -143,7 +144,11 @@ fun MainScreen() {
                 QuizScreen(
                     viewModel = quizViewModel,
                     navigateToResult = {
-                        navController.navigate(ResultRoute)
+                        navController.navigate(ResultRoute) {
+                            popUpTo<QuizRoute> {
+                                inclusive = true
+                            }
+                        }
                     },
                     navigateUp = {
                         navController.popBackStack()
@@ -154,6 +159,13 @@ fun MainScreen() {
             // ── Result ────────────────────────────────────────────────────
             composable<ResultRoute> {
                 val state by quizViewModel.state.collectAsState()
+
+                BackHandler {
+                    navController.navigate(HomeRoute){
+                        popUpTo(HomeRoute) { inclusive = false }
+                    }
+                }
+
                 ResultScreen(
                     state = state,
                     onHome = {

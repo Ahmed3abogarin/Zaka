@@ -20,6 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+
+        buildConfigField("String","INTERSTITIAL_AD_UNIT", "\"${project.findProperty("INTERSTITIAL_AD_UNIT") ?: "ca-app-pub-3940256099942544/5224354917"}\"")
+        buildConfigField("String","REWARDED_AD_UNIT", "\"${project.findProperty("REWARDED_AD_UNIT") ?: "ca-app-pub-3940256099942544/1033173712"}\"")
     }
 
     buildTypes {
@@ -36,6 +40,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }

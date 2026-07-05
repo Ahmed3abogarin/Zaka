@@ -8,6 +8,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.vtol.zaka.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -18,7 +19,7 @@ class RewardedAdManager @Inject constructor(
     private var isLoading = false
 
     companion object {
-        private const val AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
+        private const val AD_UNIT_ID = BuildConfig.REWARDED_AD_UNIT
     }
 
     fun loadAd(onLoaded: () -> Unit, onFailed: () -> Unit) {
@@ -31,12 +32,13 @@ class RewardedAdManager @Inject constructor(
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {
                     rewardedAd = ad
-                    isLoading  = false
+                    isLoading = false
                     onLoaded()
                 }
+
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     rewardedAd = null
-                    isLoading  = false
+                    isLoading = false
                     onFailed()
                 }
             }
@@ -56,6 +58,7 @@ class RewardedAdManager @Inject constructor(
                 loadAd({}, {})   // preload next ad
                 onDismissed()
             }
+
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
                 rewardedAd = null
                 onDismissed()
