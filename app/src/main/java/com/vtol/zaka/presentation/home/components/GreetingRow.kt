@@ -34,7 +34,7 @@ fun GreetingRow(state: HomeUiState) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column(horizontalAlignment = Alignment.End) {
+        Column(horizontalAlignment = Alignment.Start) {
             if (userName.isNotEmpty()) {
                 Text(
                     text = "مرحباً، $userName",

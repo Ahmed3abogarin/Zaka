@@ -162,7 +162,7 @@ fun HomeScreen(
                 Spacer(
                     Modifier
                         .statusBarsPadding()
-                        .height(12.dp)
+                        .height(6.dp)
                 )
             }
 
