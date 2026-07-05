@@ -96,6 +96,6 @@ dependencies {
     implementation(libs.coil.compose)
 
     // AdMob
-    implementation("com.google.android.gms:play-services-ads:25.4.0")
+    implementation(libs.play.services.ads)
 
 }
