@@ -69,8 +69,10 @@ class AuthRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun resetPassword(email: String): Result<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun resetPassword(
+        email: String
+    ): Result<Unit> {
+        return runCatching { auth.sendPasswordResetEmail(email).await() }
     }
 
     override fun logout() {

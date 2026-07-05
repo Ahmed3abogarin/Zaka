@@ -3,6 +3,7 @@ package com.vtol.zaka.presentation.register.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vtol.zaka.domain.usecases.auth.LoginUseCase
+import com.vtol.zaka.domain.usecases.auth.ResetPasswordUseCase
 import com.vtol.zaka.util.ValidationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -53,11 +55,40 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun restPassword() {
+        viewModelScope.launch {
+            val emailError = ValidationUtils.validateEmail(_uiState.value.email)
+
+            if (emailError != null) {
+                _uiState.update {
+                    it.copy(emailError = emailError)
+                }
+                return@launch
+            }
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+
+            resetPasswordUseCase(_uiState.value.email.trim())
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(isLoading = false, forgetPasswordSuccess = true)
+                    }
+
+                }.onFailure { e ->
+                    _uiState.update {
+                        it.copy(isLoading = false, error = e.message)
+                    }
+                }
+        }
 
     }
 
     private fun clearForgotPasswordState() {
-
+        _uiState.update {
+            it.copy(
+                forgetPasswordSuccess = false,
+                forgotPasswordError = null
+            )
+        }
     }
 
     private fun login() = viewModelScope.launch {

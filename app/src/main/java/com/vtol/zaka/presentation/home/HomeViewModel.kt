@@ -20,19 +20,19 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getAllSessionsUseCase: GetAllSessionsUseCase
-): ViewModel() {
+) : ViewModel() {
 
     val recentQuizzes: StateFlow<List<RecentQuiz>> = getAllSessionsUseCase()
         .map { sessions ->
             sessions.take(3).map { session ->
                 RecentQuiz(
-                    sessionId   = session.id,
-                    title       = session.topic,
-                    progress    = session.score / 100f,
-                    percentage  = session.score,
+                    sessionId = session.id,
+                    title = session.topic,
+                    progress = session.score / 100f,
+                    percentage = session.score,
                     accentColor = colorForScore(session.score),
-                    bgColor     = bgForScore(session.score),
-                    iconTint    = colorForScore(session.score),
+                    bgColor = bgForScore(session.score),
+                    iconTint = colorForScore(session.score),
                 )
             }
         }
@@ -42,10 +42,11 @@ class HomeViewModel @Inject constructor(
 private fun colorForScore(score: Int) = when {
     score >= 80 -> Green500
     score >= 50 -> Purple500
-    else        -> Orange400
+    else -> Orange400
 }
+
 private fun bgForScore(score: Int) = when {
     score >= 80 -> Teal100
     score >= 50 -> Purple100
-    else        -> Orange100
+    else -> Orange100
 }

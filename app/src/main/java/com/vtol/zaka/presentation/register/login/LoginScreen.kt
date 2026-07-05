@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -39,8 +40,10 @@ import com.vtol.zaka.util.showToast
 import com.vtol.zaka.R
 import com.vtol.zaka.presentation.components.LoadingIndicator
 import com.vtol.zaka.presentation.components.rememberShiningBrush
+import com.vtol.zaka.presentation.register.login.components.ForgotPasswordSheetContent
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     state: LoginUiState,
@@ -60,6 +63,27 @@ fun LoginScreen(
         state.error?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             event(LoginEvent.ErrorShown)
+        }
+    }
+
+    state.forgotPasswordError?.let { error ->
+        LaunchedEffect(error) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            event(LoginEvent.ClearForgotPasswordState)
+        }
+    }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+
+    if (state.forgetPasswordSuccess) {
+        ModalBottomSheet(
+            onDismissRequest = { event(LoginEvent.ClearForgotPasswordState) },
+            sheetState = sheetState
+        ) {
+            ForgotPasswordSheetContent(email = state.email) {
+                event(LoginEvent.ClearForgotPasswordState)
+            }
         }
     }
 
@@ -156,7 +180,12 @@ fun LoginScreen(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = {}),
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                        event(LoginEvent.RestPasswordClicked)
+                    }),
                 textAlign = TextAlign.Start
             )
 
