@@ -98,10 +98,12 @@ fun MainScreen() {
             composable<HomeRoute> {
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 val recentQuizzes by homeViewModel.recentQuizzes.collectAsState()
+                val state by homeViewModel.state.collectAsState()
                 val isAdAvailable by quizViewModel.isAdAvailable.collectAsState()
                 val quotaStatus by quizViewModel.quotaStatus.collectAsState()
 
                 HomeScreen(
+                    state = state,
                     rewardedAdManager = quizViewModel.rewardedAdManager,
                     isAdAvailable = isAdAvailable,
                     recentQuizzes = recentQuizzes,

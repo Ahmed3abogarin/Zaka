@@ -17,13 +17,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vtol.zaka.presentation.home.HomeUiState
 import com.vtol.zaka.ui.theme.Purple100
 import com.vtol.zaka.ui.theme.Purple700
 import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 
 @Composable
-fun GreetingRow() {
+fun GreetingRow(state: HomeUiState) {
+    val userName = state.user?.name?.trim()?.substringBefore(" ").orEmpty()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,12 +35,15 @@ fun GreetingRow() {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = "مرحباً، احمد",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary,
-            )
+            if (userName.isNotEmpty()) {
+                Text(
+                    text = "مرحباً، $userName",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                )
+            }
+
             Text(
                 text = "مستعد لتحدي اليوم؟",
                 fontSize = 14.sp,
@@ -53,7 +59,7 @@ fun GreetingRow() {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "أ",
+                text = userName.take(1),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Purple700,

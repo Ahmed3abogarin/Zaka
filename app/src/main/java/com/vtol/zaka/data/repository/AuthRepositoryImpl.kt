@@ -7,6 +7,7 @@ import com.google.firebase.firestore.SetOptions
 import com.vtol.zaka.domain.models.auth.AuthState
 import com.vtol.zaka.domain.models.auth.User
 import com.vtol.zaka.domain.repository.AuthRepository
+import com.vtol.zaka.util.Constants.USERS_COLLECTION
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -17,11 +18,6 @@ class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ): AuthRepository {
-
-    companion object {
-        private const val USERS_COLLECTION = "users"
-    }
-
 
     override fun authState(): Flow<AuthState> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener {

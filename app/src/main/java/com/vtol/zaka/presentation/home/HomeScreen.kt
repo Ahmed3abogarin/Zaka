@@ -38,6 +38,7 @@ import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
 fun HomeScreen(
+    state: HomeUiState,
     rewardedAdManager: RewardedAdManager,
     isAdAvailable: Boolean,
     quotaStatus: QuotaStatus,
@@ -166,7 +167,7 @@ fun HomeScreen(
             }
 
             // ── Greeting ──────────────────────────────────────────────────────
-            item { GreetingRow() }
+            item { GreetingRow(state) }
             item { Spacer(Modifier.height(28.dp)) }
 
             // ── Hero CTA card ─────────────────────────────────────────────────
@@ -263,6 +264,7 @@ fun HomeScreenPreview() {
                 onUserRewarded = {
 
                 },
+                state = HomeUiState(),
                 rewardedAdManager = RewardedAdManager(LocalContext.current)
             )
 
