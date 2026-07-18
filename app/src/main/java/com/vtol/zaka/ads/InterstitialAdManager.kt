@@ -2,6 +2,7 @@ package com.vtol.zaka.ads
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -22,8 +23,6 @@ class InterstitialAdManager @Inject constructor(
     private var interstitialAd: InterstitialAd? = null
 
     companion object {
-
-        // Replace with the real ad unit id
         private const val AD_UNIT_ID = BuildConfig.INTERSTITIAL_AD_UNIT
     }
 

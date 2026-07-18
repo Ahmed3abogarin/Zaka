@@ -37,6 +37,7 @@ val RedLight = Color(0xFFFEF2F2)
 val GreenLight = Color(0xFFF0FDF4)
 val TimerBg = Color(0xFFFFF9C4)
 val TimerText = Color(0xFFF59E0B)
+val trackColor = Color(0xFF1A1740)
 val NavBg = Color(0xFFF8F7FC)
 
 val Purple200 = Color(0xFFD9CFFF)   // light lavender glow ring

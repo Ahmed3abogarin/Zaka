@@ -47,31 +47,31 @@ fun ProgressStatCard(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector        = icon,
+                imageVector = icon,
                 contentDescription = null,
-                tint               = iconTint,
-                modifier           = Modifier.size(22.dp),
+                tint = iconTint,
+                modifier = Modifier.size(22.dp),
             )
         }
 
         // Value
         Text(
-            text       = value,
-            fontSize   = 28.sp,
+            text = value,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color      = Color(0xFF111827),
-            textAlign  = TextAlign.Start,
-            modifier   = Modifier.fillMaxWidth(),
+            color = Color(0xFF111827),
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         // Label
         Text(
-            text     = label,
+            text = label,
             fontSize = 16.sp,
-            color    = Color(0xFF6B7280),
+            color = Color(0xFF6B7280),
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Start,
-            modifier  = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
