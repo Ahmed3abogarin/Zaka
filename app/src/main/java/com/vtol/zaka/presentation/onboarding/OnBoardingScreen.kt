@@ -28,35 +28,13 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 import com.vtol.zaka.R
 import com.vtol.zaka.presentation.onboarding.components.SlideToStartButton
+import com.vtol.zaka.presentation.onboarding.model.onboardingPages
 
-// ---- Data for each onboarding page ----
-data class OnboardingPage(
-    val title: String,
-    val subtitle: String
-)
-
-val onboardingPages = listOf(
-    OnboardingPage(
-        title = "انشئ اختبارات من اي شيء",
-        subtitle = "بي دي اف، صور أو أي موضوع دراسي في ثواني معدودة"
-    ),
-    OnboardingPage(
-        title = "ذكاء اصطناعي\n" +
-                "يفهم دراستك",
-        subtitle = "أسئلة ذكية و مخصصة مع شرح مفصل لكل إجابة"
-    ),
-    OnboardingPage(
-        title = "Track Your Progress",
-        subtitle = "See your growth with clear, real-time analytics"
-    )
-)
-
-// Duration each page stays on screen before auto-advancing (ms)
 private const val PAGE_DURATION_MS = 4000
 private const val FADE_DURATION_MS = 400
 
 @Composable
-fun OnboardingScreen() {
+fun OnboardingScreen(onSlideComplete: () -> Unit) {
     var currentPage by remember { mutableIntStateOf(0) }
     var progress by remember { mutableFloatStateOf(0f) }
 
@@ -162,7 +140,7 @@ fun OnboardingScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SlideToStartButton(text = "ابدا الان") {}
+            SlideToStartButton(text = "ابدا الان", onSlideComplete = onSlideComplete)
         }
     }
 }
@@ -171,9 +149,8 @@ fun OnboardingScreen() {
 @Composable
 fun OnboardingPreview() {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-
         ZakaTheme {
-            OnboardingScreen()
+            OnboardingScreen {}
         }
     }
 }

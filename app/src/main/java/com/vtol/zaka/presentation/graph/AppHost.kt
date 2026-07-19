@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vtol.zaka.domain.models.auth.AuthState
+import com.vtol.zaka.presentation.onboarding.OnboardingScreen
 import com.vtol.zaka.ui.theme.Purple700
 import kotlinx.serialization.Serializable
 
@@ -36,9 +37,9 @@ fun AppHost() {
                 popUpTo(0) { inclusive = true }
             }
 
-//            is AuthState.OnBoarding -> navController.navigate(Routes.OnboardingScreen.route) {
-//                popUpTo(0) { inclusive = true }
-//            }
+            is AuthState.OnBoarding -> navController.navigate(OnboardingRoute) {
+                popUpTo(0) { inclusive = true }
+            }
 
             is AuthState.Error -> navController.navigate(ErrorRoute) {
                 popUpTo(0) { inclusive = true }
@@ -60,6 +61,10 @@ fun AppHost() {
             }
         }
 
+        composable<OnboardingRoute> {
+            OnboardingScreen { authViewModel.completeOnBoarding() }
+        }
+
         composable<AuthRoute> {
             AuthNavGraph()
         }
@@ -70,6 +75,9 @@ fun AppHost() {
 
     }
 }
+
+@Serializable
+object OnboardingRoute
 
 @Serializable
 object ErrorRoute

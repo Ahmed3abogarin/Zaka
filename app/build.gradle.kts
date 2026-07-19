@@ -98,4 +98,7 @@ dependencies {
     // AdMob
     implementation(libs.play.services.ads)
 
+    // data store
+    implementation(libs.datastore.preferences)
+
 }
