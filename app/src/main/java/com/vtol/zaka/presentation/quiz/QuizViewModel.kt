@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.collections.emptyList
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
@@ -76,7 +77,7 @@ class QuizViewModel @Inject constructor(
         viewModelScope.launch {
             while (true) {
                 flow.value = rewardedAdManager.isAdAvailable
-                delay(1000L)
+                delay(1000L.milliseconds)
             }
         }
     }.asStateFlow()
@@ -97,6 +98,7 @@ class QuizViewModel @Inject constructor(
     fun onUserRewarded() {
         // Give one extra quiz — increment the limit temporarily
         quotaManager.grantBonusQuiz()
+        refreshQuota() // Refresh UI immediately
         _state.update { it.copy(screenState = QuizScreenState.Loading) }
     }
 
@@ -117,28 +119,27 @@ class QuizViewModel @Inject constructor(
     }
 
     fun generateFromPdf(pdf: ByteArray, fileName: String) {
-//        val quota = checkQuizQuotaUseCase()
-//        if (!quota.canPlay) {
-//            _state.update { it.copy(screenState = QuizScreenState.QuotaExceeded) }
-//            return
-//        }
-        val storedPath = fileStorageManager.savePdf(pdf, fileName)
-        _state.update {
-            it.copy(
-                scanType = ScanType.PDF,
-                sourceFileName = fileName,
-                storedFilePath = storedPath,
-                screenState = QuizScreenState.Loading,
-            )
+        stopTimer()
+        
+        val quota = checkQuizQuotaUseCase()
+        if (!quota.canPlay) {
+            // This is a safety check; UI usually prevents this
+            _state.update { it.copy(screenState = QuizScreenState.Error("لقد استهلكت جميع المحاولات المجانية لهذا اليوم")) }
+            return
         }
+
+        val storedPath = fileStorageManager.savePdf(pdf, fileName)
+        
+        // Reset state entirely for new quiz flow
+        _state.value = QuizUiState(
+            scanType = ScanType.PDF,
+            sourceFileName = fileName,
+            storedFilePath = storedPath,
+            screenState = QuizScreenState.Loading,
+        )
 
         viewModelScope.launch {
             Log.d("QuizQuestions", "Loading")
-
-            // ✅ Set loading state
-            _state.update {
-                it.copy(screenState = QuizScreenState.Loading)
-            }
 
             generateFromPdfUseCase(pdf)
                 .fold(
@@ -171,11 +172,14 @@ class QuizViewModel @Inject constructor(
     }
 
     fun generateFromImage(bitmap: Bitmap) {
-//        val quota = checkQuizQuotaUseCase()
-//        if (!quota.canPlay) {
-//            _state.update { it.copy(screenState = QuizScreenState.QuotaExceeded) }
-//            return
-//        }
+        stopTimer()
+
+        val quota = checkQuizQuotaUseCase()
+        if (!quota.canPlay) {
+            _state.update { it.copy(screenState = QuizScreenState.Error("لقد استهلكت جميع المحاولات المجانية لهذا اليوم")) }
+            return
+        }
+
         val error = validateImageUseCase(bitmap)
         if (error != null) {
             _state.update { it.copy(screenState = QuizScreenState.Error(error.messageAr)) }
@@ -183,18 +187,16 @@ class QuizViewModel @Inject constructor(
         }
 
         val storedPath = fileStorageManager.saveImage(bitmap)
-        _state.update {
-            it.copy(
-                scanType = ScanType.IMAGE,
-                sourceFileName = "صورة ممسوحة",
-                storedFilePath = storedPath,
-                screenState = QuizScreenState.Loading,
-            )
-        }
+        
+        // Reset state entirely for new quiz flow
+        _state.value = QuizUiState(
+            scanType = ScanType.IMAGE,
+            sourceFileName = "صورة ممسوحة",
+            storedFilePath = storedPath,
+            screenState = QuizScreenState.Loading,
+        )
+        
         viewModelScope.launch {
-            _state.update {
-                it.copy(screenState = QuizScreenState.Loading)
-            }
             generateFromImageUseCase(bitmap)
                 .fold(
                     onSuccess = { questions -> _state.update { it.copy(questions = questions) } },
@@ -269,7 +271,7 @@ class QuizViewModel @Inject constructor(
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
-                delay(1000L)
+                delay(1000L.milliseconds)
                 _state.update { it.copy(elapsedSeconds = it.elapsedSeconds + 1) }
             }
         }
@@ -290,6 +292,10 @@ class QuizViewModel @Inject constructor(
     }
 
     fun retakeFromHistory(sessionId: Int) {
+        stopTimer()
+        // Reset state for loading from history
+        _state.value = QuizUiState(screenState = QuizScreenState.Loading)
+        
         viewModelScope.launch {
             retakeQuizUseCase(sessionId)
                 .fold(
