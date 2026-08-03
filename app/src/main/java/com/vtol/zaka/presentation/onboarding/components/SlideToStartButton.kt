@@ -13,13 +13,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -29,7 +29,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.ui.theme.Purple500
-import com.vtol.zaka.ui.theme.trackColor
+import com.vtol.zaka.ui.theme.Purple700
+import com.vtol.zaka.ui.theme.TextPrimary
 import kotlin.math.roundToInt
 
 @Composable
@@ -73,7 +74,7 @@ fun SlideToStartButton(
             .fillMaxWidth()
             .height(trackHeight)
             .clip(RoundedCornerShape(32.dp))
-            .background(trackColor)
+            .background(Brush.horizontalGradient(listOf(Purple700, Purple500)))
             .onGloballyPositioned { coordinates ->
                 trackWidthPx = coordinates.size.width.toFloat()
             },
@@ -126,7 +127,7 @@ fun SlideToStartButton(
                 }
                 .size(handleSize)
                 .clip(CircleShape)
-                .background(Purple500)
+                .background(Color.White)
                 .draggable(
                     orientation = Orientation.Horizontal,
                     state = dragState,
@@ -147,7 +148,7 @@ fun SlideToStartButton(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Slide to start",
-                tint = Color.White
+                tint = TextPrimary
             )
         }
     }

@@ -10,15 +10,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -29,6 +28,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import com.vtol.zaka.R
 import com.vtol.zaka.presentation.onboarding.components.SlideToStartButton
 import com.vtol.zaka.presentation.onboarding.model.onboardingPages
+import com.vtol.zaka.ui.theme.Purple700
+import com.vtol.zaka.ui.theme.TextPrimary
 
 private const val PAGE_DURATION_MS = 4000
 private const val FADE_DURATION_MS = 400
@@ -57,7 +58,7 @@ fun OnboardingScreen(onSlideComplete: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(R.drawable.img_bg),
             contentDescription = null,
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillBounds
         )
         Column(
             modifier = Modifier
@@ -83,13 +84,13 @@ fun OnboardingScreen(onSlideComplete: () -> Unit) {
                             .weight(1f)
                             .height(4.dp)
                             .clip(RoundedCornerShape(2.dp)),
-                        color = Color.White,
-                        trackColor = Color.White.copy(alpha = 0.25f)
+                        color = Purple700,
+                        trackColor = Purple700.copy(alpha = 0.25f)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // ---- Title: fades out old text, fades in new text ----
             AnimatedContent(
@@ -107,10 +108,10 @@ fun OnboardingScreen(onSlideComplete: () -> Unit) {
             ) { pageIndex ->
                 Text(
                     text = onboardingPages[pageIndex].title,
-                    color = Color.White,
+                    color = TextPrimary,
                     fontSize = 32.sp,
                     lineHeight = 38.sp,
-                    fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -132,7 +133,7 @@ fun OnboardingScreen(onSlideComplete: () -> Unit) {
             ) { pageIndex ->
                 Text(
                     text = onboardingPages[pageIndex].subtitle,
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = TextPrimary.copy(alpha = 0.9f),
                     fontSize = 16.sp,
                     lineHeight = 22.sp
                 )
