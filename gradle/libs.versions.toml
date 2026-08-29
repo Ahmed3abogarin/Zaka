@@ -25,7 +25,7 @@ credentials = "1.6.0"
 credentialsPlayServicesAuth = "1.6.0"
 googleid = "1.2.0"
 firebaseFirestore = "26.4.0"
-datastorePreferences = "1.2.0"
+datastorePreferences = "1.2.1"
 
 
 [libraries]

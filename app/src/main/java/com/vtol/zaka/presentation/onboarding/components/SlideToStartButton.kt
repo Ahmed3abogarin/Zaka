@@ -63,6 +63,8 @@ fun SlideToStartButton(
     )
 
     val dragState = rememberDraggableState { delta ->
+        // Raw pointer drag deltas are physical pixels and are NOT mirrored by the
+        // system for RTL, so we still flip them ourselves here.
         // In LTR, dragging right (positive delta) increases progress.
         // In RTL, dragging left (negative delta) increases progress, so flip the sign.
         val directional = if (isRtl) -delta else delta
@@ -120,10 +122,12 @@ fun SlideToStartButton(
             modifier = Modifier
                 .padding(4.dp)
                 .offset {
-                    // Pixel-based offset does NOT auto-mirror in RTL, so we negate it
-                    // ourselves: moving "forward" visually means moving left in RTL.
-                    val x = if (isRtl) -animatedProgress.roundToInt() else animatedProgress.roundToInt()
-                    IntOffset(x, 0)
+                    // Modifier.offset (the pixel/lambda overload) uses placeRelative
+                    // internally, which ALREADY auto-mirrors positive x for RTL —
+                    // same mechanism as Alignment.CenterStart above. No manual isRtl
+                    // flip here; doing so double-mirrors and sends the handle the
+                    // wrong way (and off-screen) in RTL.
+                    IntOffset(animatedProgress.roundToInt(), 0)
                 }
                 .size(handleSize)
                 .clip(CircleShape)
