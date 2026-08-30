@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import android.widget.Toast
 import com.vtol.zaka.ads.RewardedAdManager
 import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.domain.models.RecentQuiz
@@ -195,9 +196,14 @@ fun HomeScreen(
                         description = "التقط صورة من مذكراتك",
                         icon = Icons.Outlined.DocumentScanner,
                         tint = Purple700,
+                        enabled = !state.isOffline,
                         onClick = {
-                            if (quotaStatus.canPlay) cameraLauncher.launch(null)
-                            else showQuotaSheet = true
+                            if (state.isOffline) {
+                                Toast.makeText(context, "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                if (quotaStatus.canPlay) cameraLauncher.launch(null)
+                                else showQuotaSheet = true
+                            }
                         }
                     )
                     ActionCard(
@@ -205,9 +211,14 @@ fun HomeScreen(
                         description = "استيراد دفاتر او مذكرات",
                         icon = Icons.Outlined.PictureAsPdf,
                         tint = Purple500,
+                        enabled = !state.isOffline,
                         onClick = {
-                            if (quotaStatus.canPlay) pdfLauncher.launch("application/pdf")
-                            else showQuotaSheet = true
+                            if (state.isOffline) {
+                                Toast.makeText(context, "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                if (quotaStatus.canPlay) pdfLauncher.launch("application/pdf")
+                                else showQuotaSheet = true
+                            }
                         }
                     )
 

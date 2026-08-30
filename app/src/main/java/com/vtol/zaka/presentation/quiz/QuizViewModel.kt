@@ -25,6 +25,7 @@ import com.vtol.zaka.domain.usecases.SaveQuizSessionUseCase
 import com.vtol.zaka.domain.usecases.quiz.GenerateFromPdfUseCase
 import com.vtol.zaka.domain.usecases.quiz.ValidateImageUseCase
 import com.vtol.zaka.presentation.quiz.model.QuestionResult
+import com.vtol.zaka.util.ConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,6 +35,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -55,8 +58,11 @@ class QuizViewModel @Inject constructor(
     private val quotaManager: QuotaManager,
     val rewardedAdManager: RewardedAdManager,
     val interstitialAdManager: InterstitialAdManager,
+    private val connectivityObserver: ConnectivityObserver,
     getRecentSessions: GetRecentSessions
 ) : ViewModel() {
+
+    private var isOffline = false
 
     private val _state = MutableStateFlow(QuizUiState())
     val state = _state.asStateFlow()
@@ -86,6 +92,15 @@ class QuizViewModel @Inject constructor(
 
     init {
         interstitialAdManager.loadAd()
+        observeConnectivity()
+    }
+
+    private fun observeConnectivity() {
+        connectivityObserver.observe()
+            .onEach { status ->
+                isOffline = status != ConnectivityObserver.Status.Available
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadRewardedAd() {
@@ -128,6 +143,11 @@ class QuizViewModel @Inject constructor(
             return
         }
 
+        if (isOffline) {
+            _state.update { it.copy(screenState = QuizScreenState.Error("عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.")) }
+            return
+        }
+
         val storedPath = fileStorageManager.savePdf(pdf, fileName)
         
         // Reset state entirely for new quiz flow
@@ -151,12 +171,10 @@ class QuizViewModel @Inject constructor(
                     },
                     onFailure = { e ->
                         Log.d("QuizQuestions", "${e.message}")
-
+                        val msg = if (isOffline) "عذراً، لا يوجد اتصال بالإنترنت" else (e.message ?: "حدث خطأ غير متوقع")
                         _state.update {
                             it.copy(
-                                screenState = QuizScreenState.Error(
-                                    e.message ?: "حدث خطأ غير متوقع"
-                                )
+                                screenState = QuizScreenState.Error(msg)
                             )
                         }
                     }
@@ -186,6 +204,11 @@ class QuizViewModel @Inject constructor(
             return
         }
 
+        if (isOffline) {
+            _state.update { it.copy(screenState = QuizScreenState.Error("عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.")) }
+            return
+        }
+
         val storedPath = fileStorageManager.saveImage(bitmap)
         
         // Reset state entirely for new quiz flow
@@ -201,11 +224,10 @@ class QuizViewModel @Inject constructor(
                 .fold(
                     onSuccess = { questions -> _state.update { it.copy(questions = questions) } },
                     onFailure = { e ->
+                        val msg = if (isOffline) "عذراً، لا يوجد اتصال بالإنترنت" else (e.message ?: "حدث خطأ غير متوقع")
                         _state.update {
                             it.copy(
-                                screenState = QuizScreenState.Error(
-                                    e.message ?: "حدث خطأ غير متوقع"
-                                )
+                                screenState = QuizScreenState.Error(msg)
                             )
                         }
                     }
@@ -307,12 +329,10 @@ class QuizViewModel @Inject constructor(
                     },
                     onFailure = { e ->
                         Log.d("QuizQuestions", "${e.message}")
-
+                        val msg = if (isOffline) "عذراً، لا يوجد اتصال بالإنترنت" else (e.message ?: "حدث خطأ غير متوقع")
                         _state.update {
                             it.copy(
-                                screenState = QuizScreenState.Error(
-                                    e.message ?: "حدث خطأ غير متوقع"
-                                )
+                                screenState = QuizScreenState.Error(msg)
                             )
                         }
                     }

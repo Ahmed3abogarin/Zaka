@@ -12,13 +12,16 @@ import com.vtol.zaka.ui.theme.Orange400
 import com.vtol.zaka.ui.theme.Purple100
 import com.vtol.zaka.ui.theme.Purple500
 import com.vtol.zaka.ui.theme.Teal100
+import com.vtol.zaka.util.ConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getAllSessionsUseCase: GetAllSessionsUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -51,6 +55,16 @@ class HomeViewModel @Inject constructor(
 
     init {
         getUser()
+        observeConnectivity()
+    }
+
+    private fun observeConnectivity() {
+        connectivityObserver.observe()
+            .onEach { status ->
+                val isOffline = status != ConnectivityObserver.Status.Available
+                _state.update { it.copy(isOffline = isOffline) }
+            }
+            .launchIn(viewModelScope)
     }
 
 
@@ -77,7 +91,8 @@ class HomeViewModel @Inject constructor(
 data class HomeUiState(
     val isUserLoading: Boolean = false,
     val userError: String? = null,
-    val user: User? = null
+    val user: User? = null,
+    val isOffline: Boolean = false
 )
 
 private fun colorForScore(score: Int) = when {

@@ -36,32 +36,43 @@ import com.vtol.zaka.ui.theme.TextPrimary
 import com.vtol.zaka.ui.theme.TextSecond
 import com.vtol.zaka.ui.theme.ZakaTheme
 
+import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.ui.draw.alpha
+
 @Composable
 fun ActionCard(
     label: String,
     description: String,
     icon: ImageVector,
     tint: Color,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
+    val contentAlpha = if (enabled) 1f else 0.5f
+    val iconTint = if (enabled) tint else Color.Gray
+    val iconBg = if (enabled) tint.copy(alpha = 0.25f) else Color.LightGray.copy(alpha = 0.3f)
+
     Card(
         onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(width = 1.dp, color = BorderColor),
+        border = BorderStroke(width = 1.dp, color = if (enabled) BorderColor else BorderColor.copy(alpha = 0.5f)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(18.dp)
+                .alpha(contentAlpha),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(tint.copy(alpha = 0.25f))
-                    .size(46.dp)
+                    .background(iconBg)
+                    .size(46.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     modifier = Modifier
@@ -69,8 +80,21 @@ fun ActionCard(
                         .padding(8.dp),
                     imageVector = icon,
                     contentDescription = null,
-                    tint = tint,
+                    tint = iconTint,
                 )
+
+                if (!enabled) {
+                    Icon(
+                        imageVector = Icons.Outlined.CloudOff,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(16.dp)
+                            .background(Color.White, CircleShape)
+                            .padding(2.dp)
+                    )
+                }
             }
 
             Column(
@@ -83,14 +107,14 @@ fun ActionCard(
                     text = label,
                     fontSize = 23.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = if (enabled) TextPrimary else Color.Gray,
                 )
 
                 Text(
                     text = description,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextSecond,
+                    color = if (enabled) TextSecond else Color.Gray.copy(alpha = 0.7f),
                 )
             }
 
@@ -99,7 +123,7 @@ fun ActionCard(
                     .size(20.dp),
                 imageVector = Icons.Default.ArrowBackIosNew,
                 contentDescription = null,
-                tint = tint,
+                tint = iconTint,
             )
         }
     }

@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun QuizScreen(
@@ -52,20 +54,31 @@ fun QuizScreen(
         }
 
         is QuizScreenState.Error -> {
+            val errorMessage = (state.screenState as QuizScreenState.Error).message
+            val isOffline = errorMessage.contains("الإنترنت")
+
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                if (isOffline) {
+                    Text("📡", fontSize = 64.sp)
+                    Spacer(Modifier.height(16.dp))
+                }
+                
                 Text(
-                    text = (state.screenState as QuizScreenState.Error).message,
+                    text = errorMessage,
                     modifier = Modifier.padding(16.dp),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
                 )
+                Spacer(Modifier.height(12.dp))
                 Button(
-                    onClick = navigateUp
+                    onClick = navigateUp,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                 ) {
-                    Text("إعادة المحاولة")
+                    Text(if (isOffline) "التحقق من الاتصال والمحاولة ثانية" else "إعادة المحاولة")
                 }
             }
         }
