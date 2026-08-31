@@ -5,6 +5,8 @@ import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.generationConfig
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.vtol.zaka.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +17,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
+
+    @Provides
+    @Singleton
+    fun provideRemoteConfig(): FirebaseRemoteConfig {
+        val config = FirebaseRemoteConfig.getInstance()
+        config.setDefaultsAsync(R.xml.remote_config_defaults)
+        return config
+    }
 
     @Provides
     @Singleton

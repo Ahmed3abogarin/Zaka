@@ -1,6 +1,6 @@
-- [x] Implement `ConnectivityObserver.kt` for real-time network tracking
-- [x] Update `ActionCard` to support a disabled/offline state
-- [x] Connect `HomeViewModel` to the network observer
-- [x] Update `HomeScreen` to dim buttons and show offline feedback
-- [x] Update `QuizViewModel` to fail-fast with localized messages when offline
-- [x] Enhance `QuizScreen` error UI for connectivity issues
+- [ ] Expose `isOffline` in `QuizViewModel` state
+- [ ] Add `enabled` state to `CameraButton` UI
+- [ ] Add `enabled` state to `SecondaryActionCard` UI
+- [ ] Pass `isOffline` to `ScanContent` and handle button states
+- [ ] Update `ScanScreen` to collect and pass connectivity status
+- [ ] Verify offline behavior on the Scan screen

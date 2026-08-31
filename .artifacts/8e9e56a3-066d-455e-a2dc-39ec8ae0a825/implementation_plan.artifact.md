@@ -1,56 +1,56 @@
-# Offline Connectivity Handling Implementation Plan
+# Offline Connectivity Handling for Scan Screen
 
-This plan outlines how to handle scenarios where the user has no internet connection, ensuring a professional user experience with clear feedback instead of technical errors.
+This plan details how to disable and visually dim scan actions (Camera, PDF, Gallery) in the `ScanScreen` when the device is offline, providing consistent feedback across the app.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> The "Generate Quiz" buttons (PDF & Camera) on the Home Screen will be visually disabled when offline. Users will be able to see their history but not start new scans.
+> The Camera, Gallery, and PDF buttons on the Scan screen will be visually disabled when offline. Clicking them will show a localized Arabic error message.
 
 ## Proposed Changes
 
-### Core Utilities
+### Core Logic
 
-#### [NEW] [ConnectivityObserver.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/util/ConnectivityObserver.kt)
-Implement a modern network observer using `ConnectivityManager` to provide a real-time `Flow<Boolean>` of internet status across the app.
+#### [MODIFY] [QuizViewModel.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/quiz/QuizViewModel.kt)
+- Update `QuizUiState` to include `val isOffline: Boolean = false`.
+- Update `observeConnectivity` to update the state when network status changes.
 
 ---
 
 ### UI Components
 
-#### [MODIFY] [ActionCard.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/home/components/ActionCard.kt)
-Add an `enabled` parameter to the `ActionCard`. When `enabled = false`:
-- Apply `alpha = 0.6f` to the entire card.
-- Change the icon background tint to a neutral gray.
-- Add a "Cloud Off" icon badge in the corner.
+#### [MODIFY] [CameraButton.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/scan/components/CameraButton.kt)
+- Add an `enabled` parameter.
+- If `enabled` is false:
+    - Change the purple gradient to a gray gradient.
+    - Dim the overall opacity.
+    - Disable the click action.
 
-#### [MODIFY] [HomeScreen.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/home/HomeScreen.kt)
-Integrate the connectivity status:
-- Collect the network state from the `HomeViewModel`.
-- Pass `isOffline` to the `ActionCard` components.
-- If clicked while offline, show a snackbar with: `"عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى."`
+#### [MODIFY] [SecondaryActionCard.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/scan/components/SecondaryActionCard.kt)
+- Add an `enabled` parameter.
+- If `enabled` is false:
+    - Change the icon tint to gray.
+    - Dim the text color.
+    - Disable the click action.
+
+#### [MODIFY] [ScanContent.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/scan/ScanContent.kt)
+- Add an `isOffline` parameter.
+- Pass `enabled = !isOffline` to all action buttons.
+
+#### [MODIFY] [ScanScreen.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/scan/ScanScreen.kt)
+- Collect the `isOffline` state from the `QuizViewModel`.
+- Pass `isOffline` down to `ScanContent`.
+- Handle click events when offline by showing a Toast message.
 
 ---
-
-### Logic & Error Handling
-
-#### [MODIFY] [QuizViewModel.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/quiz/QuizViewModel.kt)
-Enhance the error handling in `generateFromPdf` and `generateFromImage`:
-- Before starting the AI request, check the network status.
-- If offline, immediately set `QuizScreenState.Error` with a localized "No Internet" message instead of waiting for a network timeout exception.
-
-#### [MODIFY] [QuizScreen.kt](file:///Users/Ahmed/AndroidStudioProjects/Zaka/app/src/main/java/com/vtol/zaka/presentation/quiz/QuizScreen.kt)
-Improve the error state UI:
-- Add a specific "Offline" illustration/icon when the error message indicates a connection issue.
-- Change the "Retry" button to "Check Connection".
 
 ## Verification Plan
 
 ### Automated Tests
-- Mock `ConnectivityObserver` in `QuizViewModelTest` to verify it fails fast when offline.
+- Verify that `QuizUiState.isOffline` correctly reflects the `ConnectivityObserver` status in unit tests.
 
 ### Manual Verification
-1. **Turn off Wi-Fi/Data**: Open the app and verify the Home screen cards are dimmed.
-2. **Attempt Scan**: Click a dimmed card and verify the Arabic error message appears.
-3. **Reconnect**: Turn on Wi-Fi and verify the buttons animate back to full color instantly.
-4. **Mid-process disconnection**: Start a scan, disconnect mid-way, and verify the loading screen transitions to a clean "No Internet" error instead of a technical crash.
+1. **Turn off Wi-Fi/Data**: Navigate to the Scan screen.
+2. **Verify UI**: Ensure the "Open Camera", "From Gallery", and "PDF File" buttons are all dimmed and gray.
+3. **Attempt Action**: Click any disabled button and verify the Arabic error Toast appears.
+4. **Reconnect**: Turn on Wi-Fi and verify the buttons instantly return to their purple/vibrant state.

@@ -24,3 +24,12 @@ fun Long.toRelativeTimeArabic(): String {
 fun Context.showToast(text: String = "Not available yet") {
     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
+
+fun Context.openUrl(url: String) {
+    try {
+        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+        startActivity(intent)
+    } catch (e: Exception) {
+        showToast("لا يمكن فتح الرابط")
+    }
+}
