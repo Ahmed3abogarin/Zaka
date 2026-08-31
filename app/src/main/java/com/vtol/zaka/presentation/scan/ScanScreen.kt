@@ -17,6 +17,8 @@ import com.vtol.zaka.data.local.getFileName
 import com.vtol.zaka.presentation.quiz.QuizViewModel
 import com.vtol.zaka.presentation.quiz.components.QuotaExceededSheet
 
+import android.widget.Toast
+
 @Composable
 fun ScanScreen(
     viewModel: QuizViewModel,
@@ -27,6 +29,7 @@ fun ScanScreen(
 
     val activity = LocalActivity.current
     val recentSessions by viewModel.recentScans.collectAsState()
+    val state by viewModel.state.collectAsState()
     
     val quotaStatus by viewModel.quotaStatus.collectAsState()
     val isAdAvailable by viewModel.isAdAvailable.collectAsState()
@@ -91,18 +94,29 @@ fun ScanScreen(
             },
         )
     }
+
+    fun handleScanAction(action: () -> Unit) {
+        if (state.isOffline) {
+            Toast.makeText(context, "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.", Toast.LENGTH_SHORT).show()
+        } else {
+            if (quotaStatus.canPlay) action()
+            else showQuotaSheet = true
+        }
+    }
+
     ScanContent(
         quotaStatus = quotaStatus,
         recentSessions = recentSessions,
+        isOffline = state.isOffline,
         navigateToViewer = navigateToViewer,
         launchPdf = {
-            pdfLauncher.launch("application/pdf")
+            handleScanAction { pdfLauncher.launch("application/pdf") }
         },
         launchCamera = {
-            cameraLauncher.launch(null)
+            handleScanAction { cameraLauncher.launch(null) }
         },
         launchGallery = {
-            galleryLauncher.launch("image/*")
+            handleScanAction { galleryLauncher.launch("image/*") }
         },
         showBottonSheet = {
             showQuotaSheet = true

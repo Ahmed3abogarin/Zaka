@@ -98,7 +98,9 @@ class QuizViewModel @Inject constructor(
     private fun observeConnectivity() {
         connectivityObserver.observe()
             .onEach { status ->
-                isOffline = status != ConnectivityObserver.Status.Available
+                val offline = status != ConnectivityObserver.Status.Available
+                isOffline = offline
+                _state.update { it.copy(isOffline = offline) }
             }
             .launchIn(viewModelScope)
     }
@@ -381,7 +383,8 @@ data class QuizUiState(
     val scanType: ScanType = ScanType.PDF,
     val sourceFileName: String = "",
     val storedFilePath: String = "",
-    val error: String? = null
+    val error: String? = null,
+    val isOffline: Boolean = false
 ) {
     val answered get() = selectedIndex != null
     val currentQuestion get() = questions.getOrNull(currentQuestionIndex)

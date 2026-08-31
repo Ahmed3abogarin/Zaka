@@ -1,6 +1,6 @@
-- [ ] Expose `isOffline` in `QuizViewModel` state
-- [ ] Add `enabled` state to `CameraButton` UI
-- [ ] Add `enabled` state to `SecondaryActionCard` UI
-- [ ] Pass `isOffline` to `ScanContent` and handle button states
-- [ ] Update `ScanScreen` to collect and pass connectivity status
-- [ ] Verify offline behavior on the Scan screen
+- [x] Expose `isOffline` in `QuizViewModel` state
+- [x] Add `enabled` state to `CameraButton` UI
+- [x] Add `enabled` state to `SecondaryActionCard` UI
+- [x] Pass `isOffline` to `ScanContent` and handle button states
+- [x] Update `ScanScreen` to collect and pass connectivity status
+- [x] Verify offline behavior on the Scan screen

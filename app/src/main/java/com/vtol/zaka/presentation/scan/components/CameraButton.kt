@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +28,16 @@ import com.vtol.zaka.ui.theme.Purple700
 
 @Composable
 fun CameraButton(
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
+    val alpha = if (enabled) 1f else 0.5f
+    val gradientColors = if (enabled) {
+        listOf(Purple500, Purple700)
+    } else {
+        listOf(Color.Gray, Color.DarkGray)
+    }
+
     Box(contentAlignment = Alignment.Center) {
         // Outer glow ring
         Box(
@@ -37,7 +46,11 @@ fun CameraButton(
                 .clip(CircleShape)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(Purple500.copy(alpha = 0.25f), Color.Transparent)
+                        colors = if (enabled) {
+                            listOf(Purple500.copy(alpha = 0.25f), Color.Transparent)
+                        } else {
+                            listOf(Color.Gray.copy(alpha = 0.1f), Color.Transparent)
+                        }
                     )
                 )
         )
@@ -45,17 +58,20 @@ fun CameraButton(
         Box(
             modifier = Modifier
                 .size(200.dp)
-                .border(width = 8.dp, color = Color(0x33E8DDFF), shape = CircleShape)
+                .border(width = 8.dp, color = if (enabled) Color(0x33E8DDFF) else Color(0x1A000000), shape = CircleShape)
                 .clip(CircleShape)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Purple500, Purple700)
+                        colors = gradientColors
                     )
                 )
-                .clickable { onClick() },
+                .clickable(enabled = true) { onClick() }, // We handle the toast in the screen
             contentAlignment = Alignment.Center,
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.alpha(alpha)
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.CameraAlt,
                     contentDescription = null,

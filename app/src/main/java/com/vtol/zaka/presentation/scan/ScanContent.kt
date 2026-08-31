@@ -37,6 +37,7 @@ import com.vtol.zaka.ui.theme.TextSecond
 fun ScanContent(
     quotaStatus: QuotaStatus,
     recentSessions: List<QuizSession>,
+    isOffline: Boolean,
     navigateToViewer: (Int) -> Unit,
     showBottonSheet: () -> Unit,
     launchPdf: () -> Unit,
@@ -86,7 +87,7 @@ fun ScanContent(
 
         // ── Camera button ─────────────────────────────────────────────────
         item {
-            CameraButton {
+            CameraButton(enabled = !isOffline) {
                 if (quotaStatus.canPlay) launchCamera()
                 else showBottonSheet()
             }
@@ -106,6 +107,7 @@ fun ScanContent(
                     label = "من المعرض",
                     icon = Icons.Outlined.Image,
                     modifier = Modifier.weight(1f),
+                    enabled = !isOffline,
                     onClick = {
                         if (quotaStatus.canPlay) launchGallery()
                         else showBottonSheet()
@@ -115,6 +117,7 @@ fun ScanContent(
                     label = "ملف PDF",
                     icon = Icons.Outlined.PictureAsPdf,
                     modifier = Modifier.weight(1f),
+                    enabled = !isOffline,
                     onClick = {
                         if (quotaStatus.canPlay) launchPdf()
                         else showBottonSheet()
