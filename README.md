@@ -41,10 +41,7 @@ The project follows the **Clean Architecture** pattern to ensure separation of c
 
 | Home Screen | Scan Options | Quiz Interface |
 | :---: | :---: | :---: |
-| ![Home](app/src/main/res/drawable/ic_launcher_foreground.xml) | ![Scan](app/src/main/res/drawable/ic_launcher_foreground.xml) | ![Quiz](app/src/main/res/drawable/ic_launcher_foreground.xml) |
-
-> [!NOTE]  
-> Please replace the placeholders above with actual screenshots of the application.
+ <img width="250" alt="Home Screen" src="https://github.com/user-attachments/assets/e4ba7402-77d3-4b07-8e87-fb018f5b0ef4" /> | <img width="250" alt="Scan Options" src="https://github.com/user-attachments/assets/349c5104-9528-4fbb-a98b-416a959212a5" /> | <img width="250" alt="Quiz Interface" src="https://github.com/user-attachments/assets/31892773-36e1-4cf4-9b2c-f34730f81c30" /> |
 
 ## ⚙️ Installation
 
