@@ -221,7 +221,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Google login button
-            GoogleLoginButton { context.showToast() }
+            GoogleLoginButton { event(LoginEvent.GoogleLoginClicked(context)) }
         }
 
         Spacer(modifier = Modifier.height(28.dp))

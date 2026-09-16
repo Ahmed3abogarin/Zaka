@@ -198,7 +198,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Google sign up button
-            GoogleLoginButton { context.showToast() }
+            GoogleLoginButton { event(SignUpEvent.OnGoogleSignUpClicked(context)) }
 
             Spacer(modifier = Modifier.height(18.dp))
 

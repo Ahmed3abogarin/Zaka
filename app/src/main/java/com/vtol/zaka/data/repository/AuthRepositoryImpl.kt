@@ -2,6 +2,7 @@ package com.vtol.zaka.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.vtol.zaka.domain.models.auth.AuthState
@@ -62,7 +63,20 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signInWithGoogle(idToken: String): Result<Unit> {
-        TODO("Not yet implemented")
+        return runCatching {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val authResult = auth.signInWithCredential(credential).await()
+            val firebaseUser = authResult.user ?: throw IllegalStateException("Google User is null")
+
+            val user = User(
+                uid = firebaseUser.uid,
+                email = firebaseUser.email ?: "",
+                name = firebaseUser.displayName ?: "",
+                imgPath = firebaseUser.photoUrl?.toString() ?: ""
+            )
+
+            saveUserToFirestore(user)
+        }
     }
 
     override suspend fun resetPassword(
