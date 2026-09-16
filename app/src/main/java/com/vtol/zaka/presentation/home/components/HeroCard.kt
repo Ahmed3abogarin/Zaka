@@ -41,14 +41,14 @@ fun HeroCard(modifier: Modifier = Modifier) {
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.Start,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "حوّل مذكراتك إلى تحديات ذكية باستخدام الذكاء الاصطناعي",
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.85f),
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.Start,
                 lineHeight = 22.sp,
             )
         }

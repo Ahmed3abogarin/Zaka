@@ -9,5 +9,5 @@ sealed class LoginEvent {
     object ErrorShown: LoginEvent()
     object ClearForgotPasswordState: LoginEvent()
 
-//    data class GoogleClicked(val context: Context): LoginEvent()
+    data class GoogleLoginClicked(val context: android.content.Context): LoginEvent()
 }

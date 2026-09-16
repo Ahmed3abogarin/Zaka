@@ -63,6 +63,7 @@ fun OnboardingScreen(onSlideComplete: () -> Unit) {
         Column(
             modifier = Modifier
                 .padding(24.dp)
+                .navigationBarsPadding()
         ) {
 
             // ---- Segmented progress bar ----

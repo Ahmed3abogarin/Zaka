@@ -159,13 +159,6 @@ fun HomeScreen(
                 .fillMaxSize(),
             contentPadding = PaddingValues(bottom = 32.dp),
         ) {
-            item {
-                Spacer(
-                    Modifier
-                        .statusBarsPadding()
-                        .height(6.dp)
-                )
-            }
 
             // ── Greeting ──────────────────────────────────────────────────────
             item { GreetingRow(state) }

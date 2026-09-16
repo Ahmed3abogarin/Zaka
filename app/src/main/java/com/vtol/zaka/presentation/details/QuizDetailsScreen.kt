@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vtol.zaka.presentation.result.components.QuestionReviewCard
@@ -76,7 +77,7 @@ fun QuizDetailScreen(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                     ) {
                         IconButton(onClick = onBack) {
                             Icon(
@@ -93,7 +94,7 @@ fun QuizDetailScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = TextPrimary
                             )
-                            Text(session.formattedDate, fontSize = 13.sp, color = TextSecond)
+                            Text(session.formattedDate, fontSize = 13.sp, color = TextSecond, textAlign = TextAlign.Start)
                         }
                     }
                 }

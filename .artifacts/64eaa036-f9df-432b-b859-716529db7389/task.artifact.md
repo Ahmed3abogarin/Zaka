@@ -1,0 +1,3 @@
+- [x] Update `LoginViewModel.kt` with better error handling for Google Sign-In
+- [x] Update `SignUpViewModel.kt` with better error handling for Google Sign-In
+- [ ] Verify if adding a nonce helps (optional)

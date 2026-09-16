@@ -1,9 +1,14 @@
 package com.vtol.zaka.presentation.register.signup
 
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.vtol.zaka.domain.models.auth.User
+import com.vtol.zaka.domain.usecases.auth.SignInWithGoogleUseCase
 import com.vtol.zaka.domain.usecases.auth.SignUpUseCase
+import com.vtol.zaka.util.Constants
 import com.vtol.zaka.util.ValidationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val signUpUseCase: SignUpUseCase
+    private val signUpUseCase: SignUpUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -55,6 +61,44 @@ class SignUpViewModel @Inject constructor(
             }
 
             is SignUpEvent.OnSignUpClicked -> register()
+
+            is SignUpEvent.OnGoogleSignUpClicked -> signInWithGoogle(event.context)
+        }
+    }
+
+    private fun signInWithGoogle(context: android.content.Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val credentialManager = CredentialManager.create(context)
+
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(Constants.WEB_CLIENT_ID)
+                .build()
+
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            try {
+                val result = credentialManager.getCredential(context, request)
+                val googleIdTokenCredential =
+                    com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.createFrom(
+                        result.credential.data
+                    )
+                val idToken = googleIdTokenCredential.idToken
+
+                signInWithGoogleUseCase(idToken)
+                    .onSuccess {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                    .onFailure { e ->
+                        _uiState.update { it.copy(isLoading = false, error = e.message) }
+                    }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
+            }
         }
     }
 

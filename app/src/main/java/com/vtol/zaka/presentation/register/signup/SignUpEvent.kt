@@ -6,4 +6,5 @@ sealed class SignUpEvent {
     data class OnPasswordChanged(val password: String): SignUpEvent()
     object ErrorShown: SignUpEvent()
     object OnSignUpClicked: SignUpEvent()
+    data class OnGoogleSignUpClicked(val context: android.content.Context): SignUpEvent()
 }
