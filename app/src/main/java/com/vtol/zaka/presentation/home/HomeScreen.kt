@@ -161,7 +161,10 @@ fun HomeScreen(
         ) {
 
             // ── Greeting ──────────────────────────────────────────────────────
-            item { GreetingRow(state) }
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+                GreetingRow(state)
+            }
             item { Spacer(Modifier.height(28.dp)) }
 
             // ── Hero CTA card ─────────────────────────────────────────────────
@@ -192,7 +195,11 @@ fun HomeScreen(
                         enabled = !state.isOffline,
                         onClick = {
                             if (state.isOffline) {
-                                Toast.makeText(context, "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
                                 if (quotaStatus.canPlay) cameraLauncher.launch(null)
                                 else showQuotaSheet = true
@@ -207,7 +214,11 @@ fun HomeScreen(
                         enabled = !state.isOffline,
                         onClick = {
                             if (state.isOffline) {
-                                Toast.makeText(context, "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "عذراً، لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
                                 if (quotaStatus.canPlay) pdfLauncher.launch("application/pdf")
                                 else showQuotaSheet = true

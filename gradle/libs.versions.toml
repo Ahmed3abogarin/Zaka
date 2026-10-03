@@ -27,6 +27,8 @@ googleid = "1.2.0"
 firebaseFirestore = "26.4.0"
 firebaseConfig = "22.1.0"
 datastorePreferences = "1.2.1"
+firebaseCrashlytics = "20.1.1"
+googleFirebaseCrashlytics = "3.0.8"
 
 
 [libraries]
@@ -63,6 +65,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 firebase-config = { group = "com.google.firebase", name = "firebase-config-ktx", version.ref = "firebaseConfig" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 
 
 [plugins]
@@ -72,4 +75,5 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 
